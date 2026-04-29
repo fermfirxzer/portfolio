@@ -273,7 +273,7 @@ export default function Page() {
                       <p className="text-[10px] font-mono font-bold text-brand-ink-soft tracking-[0.2em] mb-6">{project.num}</p>
                       <div className="mb-8">{getIcon(project.icon)}</div>
                       <h3 className="text-xl font-display font-black mb-4 leading-tight group-hover:text-brand-red transition-colors">{project.title}</h3>
-                      <p className="text-sm text-brand-ink-mid font-medium leading-relaxed mb-8">{project.description}</p>
+                      <p className="text-sm text-brand-ink-mid font-medium leading-relaxed mb-8 line-clamp-3">{project.description}</p>
                     </div>
 
                     <div className="flex flex-wrap gap-2 mb-8">

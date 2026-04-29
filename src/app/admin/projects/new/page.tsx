@@ -19,6 +19,7 @@ import {
   FileText
 } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { motion } from 'motion/react';
 
 export default function AddNewProjectPage() {
@@ -26,6 +27,17 @@ export default function AddNewProjectPage() {
   const [features, setFeatures] = useState<string[]>(['']);
   const [techStack, setTechStack] = useState<string[]>(['']);
   const [content, setContent] = useState('');
+
+  const router = useRouter();
+  const [title, setTitle] = useState('');
+  const [slug, setSlug] = useState('');
+  const [num, setNum] = useState('');
+  const [description, setDescription] = useState('');
+  const [githubUrl, setGithubUrl] = useState('');
+  const [liveUrl, setLiveUrl] = useState('');
+  const [icon, setIcon] = useState('');
+  const [error, setError] = useState('');
+  const [isPublishing, setIsPublishing] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const fileDocInputRef = useRef<HTMLInputElement>(null);
 
@@ -117,6 +129,53 @@ export default function AddNewProjectPage() {
     setTechStack(techStack.filter((_, i) => i !== index));
   };
 
+  const handlePublish = async () => {
+    setError('');
+
+    // Check required fields
+    if (!title.trim() || !slug.trim() || !num.trim() || !description.trim() || !content.trim() || !githubUrl.trim() || !liveUrl.trim() || !icon.trim()) {
+      setError('Please fill in all required fields (General Info, Links & Metadata, and Write Content).');
+      return;
+    }
+
+    // Features & Tech Stack are not required, just filter out empty strings
+    const cleanFeatures = features.filter(f => f.trim() !== '');
+    const cleanTechStack = techStack.filter(t => t.trim() !== '');
+
+    setIsPublishing(true);
+
+    try {
+      const response = await fetch('/api/projects', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: slug,
+          num,
+          title,
+          description,
+          long_desc: content,
+          icon,
+          features: cleanFeatures,
+          tech: cleanTechStack,
+          github: githubUrl
+          // live_url is not saved yet as it's not in the DB schema
+        })
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Failed to publish project');
+      }
+
+      // Success, redirect to main page
+      router.push('/');
+    } catch (err: any) {
+      setError(err.message || 'An error occurred while publishing.');
+    } finally {
+      setIsPublishing(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-brand-bg font-sans pb-24 transition-colors duration-300">
       {/* Navigation */}
@@ -126,9 +185,13 @@ export default function AddNewProjectPage() {
           BACK_TO_DASHBOARD
         </Link>
         <div className="flex items-center gap-6">
-          <button className="bg-brand-red text-white px-6 py-2 text-xs font-mono font-bold hover:bg-white hover:text-[#1c1c1c] transition-all shadow-[4px_4px_0_0_#000] flex items-center gap-2">
+          <button
+            onClick={handlePublish}
+            disabled={isPublishing}
+            className="bg-brand-red text-white px-6 py-2 text-xs font-mono font-bold hover:bg-white hover:text-[#1c1c1c] transition-all shadow-[4px_4px_0_0_#000] flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
             <Save className="w-4 h-4" />
-            PUBLISH_PROJECT
+            {isPublishing ? 'PUBLISHING...' : 'PUBLISH_PROJECT'}
           </button>
         </div>
       </nav>
@@ -165,6 +228,13 @@ export default function AddNewProjectPage() {
       <main className="max-w-6xl mx-auto px-6 lg:px-12 mt-12 grid lg:grid-cols-[1fr_320px] gap-12">
         <div className="space-y-8">
 
+          {error && (
+            <div className="bg-brand-red/10 border-2 border-brand-red p-4 text-brand-red text-sm font-bold flex items-center gap-2">
+              <Terminal className="w-4 h-4" />
+              ERROR: {error}
+            </div>
+          )}
+
           {/* Basic Info */}
           <section className="bg-brand-card border-2 border-brand-ink p-8 shadow-[8px_8px_0_0_var(--shadow)] space-y-6">
             <h2 className="text-[10px] font-mono font-bold text-brand-ink tracking-[0.2em] border-b-2 border-brand-ink pb-4 uppercase flex items-center gap-3">
@@ -174,9 +244,11 @@ export default function AddNewProjectPage() {
 
             <div className="space-y-6">
               <div>
-                <label className="block text-xs font-mono font-bold text-brand-ink mb-2 uppercase">Project Title</label>
+                <label className="block text-xs font-mono font-bold text-brand-ink mb-2 uppercase">Project Title <span className="text-brand-red">*</span></label>
                 <input
                   type="text"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
                   placeholder="e.g. MOVIE TICKET BOOKING SYSTEM"
                   className="w-full bg-brand-bg border-2 border-brand-ink p-4 font-display font-bold text-xl outline-none focus:border-brand-red transition-colors"
                 />
@@ -184,17 +256,21 @@ export default function AddNewProjectPage() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-mono font-bold text-brand-ink mb-2 uppercase">Project Slug (ID)</label>
+                  <label className="block text-xs font-mono font-bold text-brand-ink mb-2 uppercase">Project Slug (ID) <span className="text-brand-red">*</span></label>
                   <input
                     type="text"
+                    value={slug}
+                    onChange={(e) => setSlug(e.target.value)}
                     placeholder="e.g. movie-ticket-booking"
                     className="w-full bg-brand-bg border-2 border-brand-ink p-3 text-sm font-mono outline-none focus:border-brand-red transition-colors"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-mono font-bold text-brand-ink mb-2 uppercase">Project Number</label>
+                  <label className="block text-xs font-mono font-bold text-brand-ink mb-2 uppercase">Project Number <span className="text-brand-red">*</span></label>
                   <input
                     type="text"
+                    value={num}
+                    onChange={(e) => setNum(e.target.value)}
                     placeholder="e.g. PROJECT_01"
                     className="w-full bg-brand-bg border-2 border-brand-ink p-3 text-sm font-mono outline-none focus:border-brand-red transition-colors"
                   />
@@ -202,9 +278,11 @@ export default function AddNewProjectPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-mono font-bold text-brand-ink mb-2 uppercase">Short Description</label>
+                <label className="block text-xs font-mono font-bold text-brand-ink mb-2 uppercase">Short Description <span className="text-brand-red">*</span></label>
                 <textarea
                   rows={2}
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
                   placeholder="Brief summary for the project card..."
                   className="w-full bg-brand-bg border-2 border-brand-ink p-4 text-sm font-medium outline-none focus:border-brand-red transition-colors resize-none"
                 />
@@ -292,16 +370,16 @@ export default function AddNewProjectPage() {
             </h3>
             <div className="space-y-4">
               <div>
-                <label className="block text-[10px] font-mono font-bold text-brand-ink-soft mb-1">GITHUB URL</label>
-                <input type="text" className="w-full bg-brand-bg border border-brand-ink p-2 text-xs font-mono outline-none focus:border-brand-red" placeholder="https://github.com/..." />
+                <label className="block text-[10px] font-mono font-bold text-brand-ink-soft mb-1">GITHUB URL <span className="text-brand-red">*</span></label>
+                <input type="text" value={githubUrl} onChange={(e) => setGithubUrl(e.target.value)} className="w-full bg-brand-bg border border-brand-ink p-2 text-xs font-mono outline-none focus:border-brand-red" placeholder="https://github.com/..." />
               </div>
               <div>
-                <label className="block text-[10px] font-mono font-bold text-brand-ink-soft mb-1">LIVE URL</label>
-                <input type="text" className="w-full bg-brand-bg border border-brand-ink p-2 text-xs font-mono outline-none focus:border-brand-red" placeholder="https://..." />
+                <label className="block text-[10px] font-mono font-bold text-brand-ink-soft mb-1">LIVE URL <span className="text-brand-red">*</span></label>
+                <input type="text" value={liveUrl} onChange={(e) => setLiveUrl(e.target.value)} className="w-full bg-brand-bg border border-brand-ink p-2 text-xs font-mono outline-none focus:border-brand-red" placeholder="https://..." />
               </div>
               <div>
-                <label className="block text-[10px] font-mono font-bold text-brand-ink-soft mb-1">ICON NAME (Lucide)</label>
-                <input type="text" className="w-full bg-brand-bg border border-brand-ink p-2 text-xs font-mono outline-none focus:border-brand-red" placeholder="e.g. layout, globe, box" />
+                <label className="block text-[10px] font-mono font-bold text-brand-ink-soft mb-1">ICON NAME (Lucide) <span className="text-brand-red">*</span></label>
+                <input type="text" value={icon} onChange={(e) => setIcon(e.target.value)} className="w-full bg-brand-bg border border-brand-ink p-2 text-xs font-mono outline-none focus:border-brand-red" placeholder="e.g. layout, layers, box" />
               </div>
             </div>
           </section>
