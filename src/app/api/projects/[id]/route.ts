@@ -41,3 +41,28 @@ export async function GET(
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
+
+export async function PUT(
+  request: Request,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const { id } = await params;
+    const body = await request.json();
+    const { num, title, description, long_desc, icon, features, tech, github } = body;
+
+    const { data, error } = await supabase
+      .from('projects')
+      .update({ num, title, description, long_desc, icon, features, tech, github })
+      .eq('id', id)
+      .select();
+
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 400 });
+    }
+
+    return NextResponse.json(data[0], { status: 200 });
+  } catch (err: any) {
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+  }
+}

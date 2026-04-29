@@ -264,19 +264,28 @@ export default function Page() {
               projectList
                 .slice((currentPage - 1) * projectsPerPage, currentPage * projectsPerPage)
                 .map((project) => (
-                  <Link
+                  <div
                     key={project.id}
-                    href={`/${project.id}`}
-                    className="bg-brand-card border-2 border-brand-ink p-8 flex flex-col h-full shadow-[6px_6px_0_0_var(--shadow)] hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all group"
+                    className="bg-brand-card border-2 border-brand-ink p-8 flex flex-col h-full shadow-[6px_6px_0_0_var(--shadow)] hover:-translate-y-1 transition-all group relative"
                   >
                     <div className="flex-grow">
-                      <p className="text-[10px] font-mono font-bold text-brand-ink-soft tracking-[0.2em] mb-6">{project.num}</p>
-                      <div className="mb-8">{getIcon(project.icon)}</div>
-                      <h3 className="text-xl font-display font-black mb-4 leading-tight group-hover:text-brand-red transition-colors">{project.title}</h3>
-                      <p className="text-sm text-brand-ink-mid font-medium leading-relaxed mb-8 line-clamp-3">{project.description}</p>
+                      <div className="flex items-center justify-between mb-6">
+                        <p className="text-[10px] font-mono font-bold text-brand-ink-soft tracking-[0.2em]">{project.num}</p>
+                        <Link 
+                          href={`/admin/projects/${project.id}`}
+                          className="text-[10px] font-mono font-bold text-brand-ink-soft border border-brand-ink/20 px-2 py-1 hover:bg-brand-ink hover:text-brand-card transition-colors z-10 relative uppercase"
+                        >
+                          EDIT
+                        </Link>
+                      </div>
+                      <Link href={`/${project.id}`} className="block group-hover:cursor-pointer z-0">
+                        <div className="mb-8">{getIcon(project.icon)}</div>
+                        <h3 className="text-xl font-display font-black mb-4 leading-tight group-hover:text-brand-red transition-colors">{project.title}</h3>
+                        <p className="text-sm text-brand-ink-mid font-medium leading-relaxed mb-8 line-clamp-3">{project.description}</p>
+                      </Link>
                     </div>
 
-                    <div className="flex flex-wrap gap-2 mb-8">
+                    <div className="flex flex-wrap gap-2 mb-8 relative z-0">
                       {project.tech.slice(0, 3).map(t => (
                         <span key={t} className="text-[9px] font-mono font-bold border border-brand-rule bg-brand-bg px-2 py-0.5 text-brand-ink-soft uppercase tracking-tighter shadow-[1px_1px_0_0_var(--shadow)]">
                           {t}
@@ -284,10 +293,10 @@ export default function Page() {
                       ))}
                     </div>
 
-                    <div className="bg-[#1c1c1c] text-white font-mono text-[10px] font-bold py-2.5 px-4 w-full text-center flex items-center justify-center gap-2 group-hover:bg-brand-red transition-colors">
+                    <Link href={`/${project.id}`} className="bg-[#1c1c1c] text-white font-mono text-[10px] font-bold py-2.5 px-4 w-full text-center flex items-center justify-center gap-2 hover:bg-brand-red transition-colors relative z-10">
                       [ VIEW PROJECT DETAIL ]
-                    </div>
-                  </Link>
+                    </Link>
+                  </div>
                 ))
             )}
           </div>

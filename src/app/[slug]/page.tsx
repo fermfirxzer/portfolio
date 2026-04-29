@@ -125,13 +125,21 @@ export default function ProjectPage() {
       <header className="pt-32 pb-16 px-6 lg:px-12 bg-brand-card border-b-4 border-brand-ink overflow-hidden relative">
         <div className="absolute inset-0 opacity-5 pointer-events-none" style={{ backgroundImage: 'radial-gradient(var(--ink) 1px, transparent 1px)', backgroundSize: '24px 24px' }} />
         <div className="max-w-5xl mx-auto">
-          <motion.p
+          <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-[10px] font-mono font-bold text-brand-ink-soft tracking-[0.3em] mb-4 uppercase"
+            className="flex items-center gap-4 mb-4"
           >
-            {project.num}
-          </motion.p>
+            <p className="text-[10px] font-mono font-bold text-brand-ink-soft tracking-[0.3em] uppercase">
+              {project.num}
+            </p>
+            <Link 
+              href={`/admin/projects/${project.id}`}
+              className="text-[10px] font-mono font-bold text-brand-ink-soft border border-brand-ink/20 px-2 py-1 hover:bg-brand-ink hover:text-brand-card transition-colors uppercase"
+            >
+              [ EDIT PROJECT ]
+            </Link>
+          </motion.div>
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
