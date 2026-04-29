@@ -25,6 +25,7 @@ export async function GET() {
       features: p.features,
       tech: p.tech,
       github: p.github,
+      isPublished: p.is_published,
       contributors: (p.contributors || []).map((c: any) => ({
         name: c.name,
         github: c.github
@@ -40,7 +41,7 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { id, num, title, description, long_desc, icon, features, tech, github } = body;
+    const { id, num, title, description, long_desc, icon, features, tech, github, is_published } = body;
 
     const { data, error } = await supabase
       .from('projects')
@@ -54,7 +55,8 @@ export async function POST(request: Request) {
           icon, 
           features, 
           tech, 
-          github
+          github,
+          is_published: is_published ?? true
         }
       ])
       .select();

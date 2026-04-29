@@ -13,9 +13,13 @@ import {
 import { motion } from 'motion/react';
 import Link from 'next/link';
 import { Project, fetchProjects, getIcon } from '@/lib/projects';
+import { Language, translations } from '@/lib/i18n';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
 
 export default function Page() {
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
+  const [lang, setLang] = useState<Language>('en');
+  const t = translations[lang];
   const [projectList, setProjectList] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [progress, setProgress] = useState(0);
@@ -47,6 +51,8 @@ export default function Page() {
 
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme') as 'light' | 'dark';
+    const savedLang = localStorage.getItem('lang') as Language;
+    if (savedLang) setLang(savedLang);
     if (savedTheme) {
       setTheme(savedTheme);
       document.documentElement.setAttribute('data-theme', savedTheme);
@@ -73,21 +79,17 @@ export default function Page() {
           JIRAYUS.EXE
         </a>
         <div className="hidden md:flex gap-8 items-center">
-          {['ABOUT', 'PROJECTS', 'SKILLS', 'CONTACT'].map((item) => (
+          {[{id: 'about', label: t.nav.about}, {id: 'projects', label: t.nav.projects}, {id: 'skills', label: t.nav.skills}, {id: 'contact', label: t.nav.contact}].map((item) => (
             <a
               key={item}
-              href={`#${item.toLowerCase()}`}
-              className="text-[10px] font-mono font-medium text-gray-400 hover:text-white transition-colors tracking-[0.2em]"
-            >
-              {item}
-            </a>
+              href={`#${item.id}`}
+              className="text-xs font-mono font-medium text-gray-400 hover:text-white transition-colors tracking-[0.2em]"
+            >{item.label}</a>
           ))}
           <Link
             href="/about-info"
-            className="text-[10px] font-mono font-bold text-brand-red border border-brand-red/30 px-2 py-1 hover:bg-brand-red hover:text-white transition-all tracking-[0.2em]"
-          >
-            SITE_INFO
-          </Link>
+            className="text-xs font-mono font-bold text-brand-red border border-brand-red/30 px-2 py-1 hover:bg-brand-red hover:text-white transition-all tracking-[0.2em]"
+          >{t.nav.site_info}</Link>
           <button
             onClick={toggleTheme}
             className="text-white hover:text-brand-red transition-colors p-2"
@@ -95,12 +97,13 @@ export default function Page() {
           >
             {theme === 'light' ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
           </button>
+          <LanguageSwitcher lang={lang} setLang={setLang} />
         </div>
         <a
           href="#contact"
           className="bg-white text-[#1c1c1c] px-4 py-1.5 text-xs font-mono font-bold hover:bg-brand-red hover:text-white transition-all shadow-[4px_4px_0_0_#d63b2a]"
         >
-          [ CONTACT ]
+          [ {t.nav.contact} ]
         </a>
       </nav>
 
@@ -115,7 +118,7 @@ export default function Page() {
           viewport={{ once: true }}
           className="text-xs font-mono text-brand-ink-soft tracking-[0.3em] mb-8"
         >
-          ▶ LOADING PORTFOLIO... {progress}% {progress === 100 ? 'DONE' : ''}
+          {t.hero.loading} {progress}% {progress === 100 ? 'DONE' : ''}
         </motion.p>
 
         <motion.h1
@@ -143,7 +146,7 @@ export default function Page() {
           viewport={{ once: true }}
           className="text-lg md:text-xl font-display font-medium text-brand-ink-mid tracking-[0.2em] mb-12 uppercase"
         >
-          Full Stack Developer
+          {t.hero.role}
         </motion.p>
 
         <motion.div
@@ -154,13 +157,13 @@ export default function Page() {
           className="flex flex-wrap justify-center gap-6 mb-16"
         >
           {[
-            { label: '7 MONTHS', sub: 'INTERNSHIP' },
-            { label: '3.31 GPA', sub: 'KMUTNB' },
-            { label: 'MAY 2026', sub: 'GRADUATION' }
+            { label: t.hero.stats.months, sub: t.hero.stats.internship },
+            { label: t.hero.stats.gpa, sub: t.hero.stats.university },
+            { label: t.hero.stats.gradDate, sub: t.hero.stats.graduation }
           ].map((stat, i) => (
             <div key={i} className="bg-brand-bg border-2 border-brand-ink px-6 py-4 shadow-[4px_4px_0_0_var(--shadow)] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-none transition-all">
               <p className="text-xl font-display font-bold">{stat.label}</p>
-              <p className="text-[10px] font-mono font-bold text-brand-ink-soft uppercase mt-1 tracking-wider">{stat.sub}</p>
+              <p className="text-xs font-mono font-bold text-brand-ink-soft uppercase mt-1 tracking-wider">{stat.sub}</p>
             </div>
           ))}
         </motion.div>
@@ -173,10 +176,10 @@ export default function Page() {
           className="flex flex-wrap justify-center gap-4"
         >
           <a href="#projects" className="bg-[#1c1c1c] text-white px-8 py-3.5 font-display font-extrabold tracking-widest text-sm hover:translate-x-0.5 hover:translate-y-0.5 transition-transform flex items-center gap-2 group shadow-[4px_4px_0_0_#d63b2a]">
-            ▶ VIEW PROJECTS
+            {t.hero.viewProjects}
           </a>
           <a href="https://github.com/fermfirxzer" target="_blank" className="bg-transparent border-2 border-brand-ink text-brand-ink px-6 py-3.5 font-display font-extrabold tracking-widest text-sm hover:bg-brand-bg transition-colors flex items-center gap-2">
-            <Github className="w-4 h-4" /> GITHUB
+            <Github className="w-4 h-4" /> {t.hero.github}
           </a>
         </motion.div>
       </section>
@@ -184,28 +187,28 @@ export default function Page() {
       {/* About Section */}
       <section id="about" className="py-24 px-6 lg:px-12 border-b-4 border-brand-ink">
         <div className="max-w-5xl mx-auto">
-          <SectionHeader title="ABOUT ME" />
+          <SectionHeader title={t.about.title} />
           <div className="grid md:grid-cols-2 gap-8 mt-12">
             <div className="bg-brand-card border-2 border-brand-ink p-8 shadow-[6px_6px_0_0_var(--shadow)]">
-              <h3 className="text-[10px] font-mono font-bold text-brand-ink-soft tracking-[0.2em] border-b-2 border-brand-ink pb-4 mb-6 uppercase">// PROFILE</h3>
+              <h3 className="text-xs font-mono font-bold text-brand-ink-soft tracking-[0.2em] border-b-2 border-brand-ink pb-4 mb-6 uppercase">{t.about.profile}</h3>
               <p className="leading-relaxed text-base italic text-brand-ink-mid">
-                Computer Science student at King Mongkut's University of Technology North Bangkok (KMUTNB).
+                {t.about.desc1}
               </p>
               <p className="leading-relaxed text-base mt-4 font-medium text-brand-ink-mid">
-                I am a dedicated developer focused on building scalable, modern web applications that solve real-world problems. With hands-on industry experience from internship, I bring production-ready coding practices to every project.
+                {t.about.desc2}
               </p>
             </div>
             <div className="bg-brand-card border-2 border-brand-ink p-8 shadow-[6px_6px_0_0_var(--shadow)]">
-              <h3 className="text-[10px] font-mono font-bold text-brand-ink-soft tracking-[0.2em] border-b-2 border-brand-ink pb-4 mb-6 uppercase">// EDUCATION</h3>
+              <h3 className="text-xs font-mono font-bold text-brand-ink-soft tracking-[0.2em] border-b-2 border-brand-ink pb-4 mb-6 uppercase">{t.about.education}</h3>
               <div className="flex items-start gap-4">
                 <GraduationCap className="w-8 h-8 text-brand-red flex-shrink-0" />
                 <div>
-                  <p className="font-display font-bold text-lg text-brand-ink">B.Sc. Computer Science</p>
-                  <p className="text-sm font-medium text-brand-ink-mid mt-1">Faculty of Applied Science, KMUTNB</p>
+                  <p className="font-display font-bold text-lg text-brand-ink">{t.about.degree}</p>
+                  <p className="text-sm font-medium text-brand-ink-mid mt-1">{t.about.faculty}</p>
                   <p className="text-xs font-mono font-bold text-brand-ink-soft mt-2 tracking-widest uppercase">2022 — 2026</p>
                   <div className="inline-flex items-center gap-2 bg-brand-bg border border-brand-ink mt-4 px-3 py-1 text-xs font-bold tracking-wider">
                     <Star className="w-3 h-3 text-brand-red fill-brand-red" />
-                    GPA 3.31 / 4.00
+                    {t.about.gpa}
                   </div>
                 </div>
               </div>
@@ -217,16 +220,16 @@ export default function Page() {
       {/* Experience Section */}
       <section id="experience" className="py-24 px-6 lg:px-12 bg-brand-card/50 border-b-4 border-brand-ink">
         <div className="max-w-5xl mx-auto">
-          <SectionHeader title="EXPERIENCE" />
+          <SectionHeader title={t.experience.title} />
           <div className="mt-12 bg-brand-card border-2 border-brand-ink p-8 shadow-[8px_8px_0_0_var(--shadow)]">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
               <div>
-                <h3 className="text-[10px] font-mono font-bold text-brand-ink-soft tracking-[0.2em] mb-2 uppercase">Software Developer Intern</h3>
+                <h3 className="text-xs font-mono font-bold text-brand-ink-soft tracking-[0.2em] mb-2 uppercase">{t.experience.role}</h3>
                 <p className="text-2xl font-display font-black text-brand-ink">SCICAP CO., LTD.</p>
               </div>
               <div className="text-right">
-                <p className="bg-[#1c1c1c] text-white px-4 py-1 text-[10px] font-mono font-bold tracking-widest inline-block uppercase">7 Months</p>
-                <p className="text-xs font-mono font-medium text-brand-ink-soft mt-2 tracking-widest uppercase">Bangkok, Thailand</p>
+                <p className="bg-[#1c1c1c] text-white px-4 py-1 text-xs font-mono font-bold tracking-widest inline-block uppercase">{t.experience.duration}</p>
+                <p className="text-xs font-mono font-medium text-brand-ink-soft mt-2 tracking-widest uppercase">{t.experience.location}</p>
               </div>
             </div>
             <ul className="space-y-4">
@@ -249,7 +252,7 @@ export default function Page() {
       {/* Projects Section */}
       <section id="projects" className="py-24 px-6 lg:px-12 border-b-4 border-brand-ink">
         <div className="max-w-6xl mx-auto">
-          <SectionHeader title="PROJECTS" />
+          <SectionHeader title={t.projects.title} />
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mt-12">
             {loading ? (
               [1, 2, 3].map((i) => (
@@ -262,6 +265,7 @@ export default function Page() {
               ))
             ) : (
               projectList
+                .filter(p => p.isPublished)
                 .slice((currentPage - 1) * projectsPerPage, currentPage * projectsPerPage)
                 .map((project) => (
                   <div
@@ -270,10 +274,10 @@ export default function Page() {
                   >
                     <div className="flex-grow">
                       <div className="flex items-center justify-between mb-6">
-                        <p className="text-[10px] font-mono font-bold text-brand-ink-soft tracking-[0.2em]">{project.num}</p>
+                        <p className="text-xs font-mono font-bold text-brand-ink-soft tracking-[0.2em]">{project.num}</p>
                         <Link 
                           href={`/admin/projects/${project.id}`}
-                          className="text-[10px] font-mono font-bold text-brand-ink-soft border border-brand-ink/20 px-2 py-1 hover:bg-brand-ink hover:text-brand-card transition-colors z-10 relative uppercase"
+                          className="text-xs font-mono font-bold text-brand-ink-soft border border-brand-ink/20 px-2 py-1 hover:bg-brand-ink hover:text-brand-card transition-colors z-10 relative uppercase"
                         >
                           EDIT
                         </Link>
@@ -287,14 +291,14 @@ export default function Page() {
 
                     <div className="flex flex-wrap gap-2 mb-8 relative z-0">
                       {project.tech.slice(0, 3).map(t => (
-                        <span key={t} className="text-[9px] font-mono font-bold border border-brand-rule bg-brand-bg px-2 py-0.5 text-brand-ink-soft uppercase tracking-tighter shadow-[1px_1px_0_0_var(--shadow)]">
+                        <span key={t} className="text-xs font-mono font-bold border border-brand-rule bg-brand-bg px-2 py-0.5 text-brand-ink-soft uppercase tracking-tighter shadow-[1px_1px_0_0_var(--shadow)]">
                           {t}
                         </span>
                       ))}
                     </div>
 
-                    <Link href={`/${project.id}`} className="bg-[#1c1c1c] text-white font-mono text-[10px] font-bold py-2.5 px-4 w-full text-center flex items-center justify-center gap-2 hover:bg-brand-red transition-colors relative z-10">
-                      [ VIEW PROJECT DETAIL ]
+                    <Link href={`/${project.id}`} className="bg-[#1c1c1c] text-white font-mono text-xs font-bold py-2.5 px-4 w-full text-center flex items-center justify-center gap-2 hover:bg-brand-red transition-colors relative z-10">
+                      {t.projects.viewDetail}
                     </Link>
                   </div>
                 ))
@@ -302,7 +306,7 @@ export default function Page() {
           </div>
 
           {/* Pagination Controls */}
-          {!loading && projectList.length > projectsPerPage && (
+          {!loading && projectList.filter(p => p.isPublished).length > projectsPerPage && (
             <div className="mt-16 flex items-center justify-center gap-4">
               <button
                 onClick={() => {
@@ -315,27 +319,23 @@ export default function Page() {
                   : 'bg-brand-bg hover:bg-brand-ink hover:text-brand-bg shadow-[4px_4px_0_0_var(--shadow)] hover:shadow-none hover:translate-x-0.5 hover:translate-y-0.5'
                   }`}
               >
-                <ChevronRight className="w-4 h-4 rotate-180" />
-                PREVIOUS
-              </button>
+                <ChevronRight className="w-4 h-4 rotate-180" /> {t.projects.prev} </button>
 
               <div className="flex items-center gap-2 px-4 py-2 bg-brand-card border-2 border-brand-ink font-mono text-xs font-black">
-                {String(currentPage).padStart(2, '0')} / {String(Math.ceil(projectList.length / projectsPerPage)).padStart(2, '0')}
+                {String(currentPage).padStart(2, '0')} / {String(Math.ceil(projectList.filter(p => p.isPublished).length / projectsPerPage)).padStart(2, '0')}
               </div>
 
               <button
                 onClick={() => {
-                  setCurrentPage(prev => Math.min(prev + 1, Math.ceil(projectList.length / projectsPerPage)));
+                  setCurrentPage(prev => Math.min(prev + 1, Math.ceil(projectList.filter(p => p.isPublished).length / projectsPerPage)));
                   document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth' });
                 }}
-                disabled={currentPage === Math.ceil(projectList.length / projectsPerPage)}
-                className={`flex items-center gap-2 px-6 py-3 font-mono text-xs font-bold border-2 border-brand-ink transition-all ${currentPage === Math.ceil(projectList.length / projectsPerPage)
+                disabled={currentPage === Math.ceil(projectList.filter(p => p.isPublished).length / projectsPerPage)}
+                className={`flex items-center gap-2 px-6 py-3 font-mono text-xs font-bold border-2 border-brand-ink transition-all ${currentPage === Math.ceil(projectList.filter(p => p.isPublished).length / projectsPerPage)
                   ? 'opacity-30 cursor-not-allowed'
                   : 'bg-brand-bg hover:bg-brand-ink hover:text-brand-bg shadow-[4px_4px_0_0_var(--shadow)] hover:shadow-none hover:translate-x-0.5 hover:translate-y-0.5'
                   }`}
-              >
-                NEXT
-                <ChevronRight className="w-4 h-4" />
+              > {t.projects.next} <ChevronRight className="w-4 h-4" />
               </button>
             </div>
           )}
@@ -345,13 +345,13 @@ export default function Page() {
       {/* Skills Section */}
       <section id="skills" className="py-24 px-6 lg:px-12 bg-brand-card border-b-4 border-brand-ink">
         <div className="max-w-4xl mx-auto">
-          <SectionHeader title="TECH STACK" />
+          <SectionHeader title={t.skills.title} />
           <div className="mt-12 space-y-1">
             {[
-              { cat: 'FRONT-END', items: ['HTML', 'CSS', 'React.js', 'Next.js', 'Tailwind CSS', 'Bootstrap', 'Thymeleaf'] },
-              { cat: 'BACK-END', items: ['Node.js', 'Express.js', 'PHP', 'Spring Boot', 'REST API', 'Struts 2'] },
-              { cat: 'DATABASE', items: ['MySQL', 'MongoDB'] },
-              { cat: 'TOOLS', items: ['Git', 'GitHub', 'Docker', 'Postman', 'Figma'] }
+              { cat: t.skills.front, items: ['HTML', 'CSS', 'React.js', 'Next.js', 'Tailwind CSS', 'Bootstrap', 'Thymeleaf'] },
+              { cat: t.skills.back, items: ['Node.js', 'Express.js', 'PHP', 'Spring Boot', 'REST API', 'Struts 2'] },
+              { cat: t.skills.db, items: ['MySQL', 'MongoDB'] },
+              { cat: t.skills.tools, items: ['Git', 'GitHub', 'Docker', 'Postman', 'Figma'] }
             ].map((row, i) => (
               <div key={i} className="grid md:grid-cols-[180px_1fr] border-t-2 border-brand-ink py-8 gap-6 group">
                 <p className="text-xs font-mono font-bold text-brand-ink-soft tracking-[0.2em] pt-1 uppercase group-hover:text-brand-ink transition-colors">{row.cat}</p>
@@ -375,26 +375,26 @@ export default function Page() {
       {/* Contact Section */}
       <section id="contact" className="py-24 px-6 lg:px-12 border-b-4 border-brand-ink">
         <div className="max-w-2xl mx-auto text-center">
-          <SectionHeader title="CONTACT" />
+          <SectionHeader title={t.contact.title} />
           <p className="mt-8 text-brand-ink-mid font-medium mb-12">
-            OPEN TO FULL-STACK & BACK-END ROLES<br />
-            AVAILABLE FULL-TIME FROM MAY 2026
+            {t.contact.subtitle1}<br />
+            {t.contact.subtitle2}
           </p>
 
           <div className="flex flex-col border-2 border-brand-ink divide-y-2 divide-brand-ink shadow-[8px_8px_0_0_var(--shadow)]">
-            <ContactItem label="PHONE" value="080-057-3832" href="tel:0800573832" />
-            <ContactItem label="EMAIL" value="jirayusfirxzer@gmail.com" href="mailto:jirayusfirxzer@gmail.com" />
-            <ContactItem label="GITHUB" value="fermfirxzer" href="https://github.com/fermfirxzer" target="_blank" />
+            <ContactItem label={t.contact.phone} value="080-057-3832" href="tel:0800573832" />
+            <ContactItem label={t.contact.email} value="jirayusfirxzer@gmail.com" href="mailto:jirayusfirxzer@gmail.com" />
+            <ContactItem label={t.contact.github} value="fermfirxzer" href="https://github.com/fermfirxzer" target="_blank" />
           </div>
         </div>
       </section>
 
       <footer className="bg-[#1c1c1c] py-10 px-6 lg:px-12 flex flex-col md:flex-row items-center justify-between gap-6">
-        <p className="text-[10px] font-mono font-bold text-gray-500 tracking-widest uppercase">
-          © 2026 JIRAYUS MOOLSART. BUILT WITH TYPE-SAFE COMPONENTS.
+        <p className="text-xs font-mono font-bold text-gray-500 tracking-widest uppercase">
+          {t.footer.copy}
         </p>
         <div className="flex gap-6">
-          <a href="https://github.com/fermfirxzer" target="_blank" className="text-[10px] font-mono font-bold text-gray-400 hover:text-white transition-colors tracking-widest uppercase">
+          <a href="https://github.com/fermfirxzer" target="_blank" className="text-xs font-mono font-bold text-gray-400 hover:text-white transition-colors tracking-widest uppercase">
             GITHUB.COM/FERMFIRXZER ↗
           </a>
         </div>
@@ -428,7 +428,7 @@ function ContactItem({ label, value, href, target }: { label: string, value: str
       className="group bg-brand-card hover:bg-[#1c1c1c] transition-colors flex items-center justify-between p-6 md:p-8"
     >
       <div className="flex items-center gap-8 text-left">
-        <p className="w-20 text-[10px] font-mono font-bold text-brand-ink-soft tracking-[0.2em] group-hover:text-white/40 transition-colors uppercase">{label}</p>
+        <p className="w-20 text-xs font-mono font-bold text-brand-ink-soft tracking-[0.2em] group-hover:text-white/40 transition-colors uppercase">{label}</p>
         <p className="text-lg md:text-xl font-display font-bold text-brand-ink group-hover:text-white transition-colors uppercase">{value}</p>
       </div>
       <ExternalLink className="w-5 h-5 text-brand-ink-soft group-hover:text-brand-red transition-colors" />

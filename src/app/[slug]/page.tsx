@@ -14,6 +14,8 @@ import {
 } from 'lucide-react';
 import { motion } from 'motion/react';
 import Link from 'next/link';
+import { Language } from '@/lib/i18n';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
 
 export default function ProjectPage() {
   const params = useParams();
@@ -22,6 +24,7 @@ export default function ProjectPage() {
   const [project, setProject] = useState<Project | null>(null);
   const [loading, setLoading] = useState(true);
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
+  const [lang, setLang] = useState<Language>('en');
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
@@ -51,6 +54,8 @@ export default function ProjectPage() {
 
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme') as 'light' | 'dark';
+    const savedLang = localStorage.getItem('lang') as Language;
+    if (savedLang) setLang(savedLang);
     if (savedTheme) {
       setTheme(savedTheme);
       document.documentElement.setAttribute('data-theme', savedTheme);
@@ -101,7 +106,7 @@ export default function ProjectPage() {
         <div className="flex items-center gap-6">
           <Link
             href="/about-info"
-            className="text-[10px] font-mono font-bold text-brand-red border border-brand-red/30 px-2 py-1 hover:bg-brand-red hover:text-white transition-all tracking-[0.2em]"
+            className="text-xs font-mono font-bold text-brand-red border border-brand-red/30 px-2 py-1 hover:bg-brand-red hover:text-white transition-all tracking-[0.2em]"
           >
             SITE_INFO
           </Link>
@@ -112,6 +117,7 @@ export default function ProjectPage() {
           >
             {theme === 'light' ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
           </button>
+          <LanguageSwitcher lang={lang} setLang={setLang} />
           <a
             href="#contact"
             className="bg-white text-[#1c1c1c] px-4 py-1.5 text-xs font-mono font-bold hover:bg-brand-red hover:text-white transition-all shadow-[4px_4px_0_0_#d63b2a]"
@@ -124,18 +130,18 @@ export default function ProjectPage() {
       {/* Hero Header */}
       <header className="pt-32 pb-16 px-6 lg:px-12 bg-brand-card border-b-4 border-brand-ink overflow-hidden relative">
         <div className="absolute inset-0 opacity-5 pointer-events-none" style={{ backgroundImage: 'radial-gradient(var(--ink) 1px, transparent 1px)', backgroundSize: '24px 24px' }} />
-        <div className="max-w-5xl mx-auto">
+        <div className="max-w-7xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             className="flex items-center gap-4 mb-4"
           >
-            <p className="text-[10px] font-mono font-bold text-brand-ink-soft tracking-[0.3em] uppercase">
+            <p className="text-xs font-mono font-bold text-brand-ink-soft tracking-[0.3em] uppercase">
               {project.num}
             </p>
             <Link 
               href={`/admin/projects/${project.id}`}
-              className="text-[10px] font-mono font-bold text-brand-ink-soft border border-brand-ink/20 px-2 py-1 hover:bg-brand-ink hover:text-brand-card transition-colors uppercase"
+              className="text-xs font-mono font-bold text-brand-ink-soft border border-brand-ink/20 px-2 py-1 hover:bg-brand-ink hover:text-brand-card transition-colors uppercase"
             >
               [ EDIT PROJECT ]
             </Link>
@@ -156,7 +162,7 @@ export default function ProjectPage() {
           />
           <div className="flex flex-wrap gap-3">
             {project.tech.map(t => (
-              <span key={t} className="bg-brand-bg border-2 border-brand-ink px-3 py-1 text-[10px] font-mono font-bold text-brand-ink uppercase shadow-[2px_2px_0_0_var(--shadow)]">
+              <span key={t} className="bg-brand-bg border-2 border-brand-ink px-3 py-1 text-xs font-mono font-bold text-brand-ink uppercase shadow-[2px_2px_0_0_var(--shadow)]">
                 {t}
               </span>
             ))}
@@ -165,11 +171,11 @@ export default function ProjectPage() {
       </header>
 
       {/* Content */}
-      <main className="max-w-5xl mx-auto px-6 lg:px-12 mt-16 grid md:grid-cols-[1fr_320px] gap-12">
+      <main className="max-w-7xl mx-auto px-6 lg:px-12 mt-16 grid md:grid-cols-[1fr_320px] gap-12">
         {/* Left Column: Info */}
         <div className="space-y-12">
           <section>
-            <h2 className="text-[10px] font-mono font-bold text-brand-ink tracking-[0.2em] mb-6 border-b-2 border-brand-ink pb-4 uppercase flex items-center gap-3">
+            <h2 className="text-xs font-mono font-bold text-brand-ink tracking-[0.2em] mb-6 border-b-2 border-brand-ink pb-4 uppercase flex items-center gap-3">
               <ChevronRight className="w-4 h-4 text-brand-red" />
               Overview
             </h2>
@@ -179,7 +185,7 @@ export default function ProjectPage() {
           </section>
 
           <section>
-            <h2 className="text-[10px] font-mono font-bold text-brand-ink tracking-[0.2em] mb-6 border-b-2 border-brand-ink pb-4 uppercase flex items-center gap-3">
+            <h2 className="text-xs font-mono font-bold text-brand-ink tracking-[0.2em] mb-6 border-b-2 border-brand-ink pb-4 uppercase flex items-center gap-3">
               <ChevronRight className="w-4 h-4 text-brand-red" />
               Key Features
             </h2>
@@ -197,7 +203,7 @@ export default function ProjectPage() {
         {/* Right Column: Cooperation & Links */}
         <aside className="space-y-12">
           <section>
-            <h2 className="text-[10px] font-mono font-bold text-brand-ink tracking-[0.2em] mb-6 border-b-2 border-brand-ink pb-4 uppercase flex items-center gap-3">
+            <h2 className="text-xs font-mono font-bold text-brand-ink tracking-[0.2em] mb-6 border-b-2 border-brand-ink pb-4 uppercase flex items-center gap-3">
               <Users className="w-4 h-4 text-brand-red" />
               Cooperation
             </h2>
@@ -227,7 +233,7 @@ export default function ProjectPage() {
           </section>
 
           <section>
-            <h2 className="text-[10px] font-mono font-bold text-brand-ink tracking-[0.2em] mb-6 border-b-2 border-brand-ink pb-4 uppercase flex items-center gap-3">
+            <h2 className="text-xs font-mono font-bold text-brand-ink tracking-[0.2em] mb-6 border-b-2 border-brand-ink pb-4 uppercase flex items-center gap-3">
               <Github className="w-4 h-4 text-brand-red" />
               Source Code
             </h2>
@@ -243,7 +249,7 @@ export default function ProjectPage() {
       </main>
 
       {/* Breadcrumb footer */}
-      <div className="max-w-5xl mx-auto px-6 lg:px-12 mt-24">
+      <div className="max-w-7xl mx-auto px-6 lg:px-12 mt-24">
         <Link href="/" className="inline-flex items-center gap-3 bg-brand-card border-2 border-brand-ink px-6 py-3 font-mono font-bold text-xs tracking-widest hover:translate-x-1 hover:shadow-none shadow-[4px_4px_0_0_var(--shadow)] transition-all">
           <ChevronLeft className="w-4 h-4" />
           RETURN_TO_PORTFOLIO

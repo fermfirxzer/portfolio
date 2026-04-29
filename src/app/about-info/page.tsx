@@ -17,12 +17,49 @@ import {
 } from 'lucide-react';
 import { motion } from 'motion/react';
 import Link from 'next/link';
+import { Language, translations } from '@/lib/i18n';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
+
+interface Commit {
+  sha: string;
+  commit: {
+    message: string;
+    author: {
+      name: string;
+      date: string;
+    };
+  };
+  html_url: string;
+}
 
 export default function AboutSitePage() {
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
+  const [lang, setLang] = useState<Language>('en');
+  const t = translations[lang];
+  const [commits, setCommits] = useState<Commit[]>([]);
+  const [commitsLoading, setCommitsLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchCommits() {
+      try {
+        const res = await fetch('https://api.github.com/repos/fermfirxzer/portfolio/commits?per_page=4');
+        if (res.ok) {
+          const data = await res.json();
+          setCommits(data);
+        }
+      } catch (e) {
+        console.error('Failed to fetch commits');
+      } finally {
+        setCommitsLoading(false);
+      }
+    }
+    fetchCommits();
+  }, []);
 
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme') as 'light' | 'dark';
+    const savedLang = localStorage.getItem('lang') as Language;
+    if (savedLang) setLang(savedLang);
     if (savedTheme) {
       setTheme(savedTheme);
       document.documentElement.setAttribute('data-theme', savedTheme);
@@ -61,6 +98,7 @@ export default function AboutSitePage() {
           >
             {theme === 'light' ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
           </button>
+          <LanguageSwitcher lang={lang} setLang={setLang} />
           <a
             href="https://github.com/fermfirxzer/portfolio-v2" 
             target="_blank"
@@ -78,7 +116,7 @@ export default function AboutSitePage() {
           <motion.p
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-[10px] font-mono font-bold text-brand-ink-soft tracking-[0.3em] mb-4 uppercase"
+            className="text-xs font-mono font-bold text-brand-ink-soft tracking-[0.3em] mb-4 uppercase"
           >
             META_INFORMATION
           </motion.p>
@@ -104,7 +142,7 @@ export default function AboutSitePage() {
         <div className="space-y-16">
           {/* Concept */}
           <section>
-            <h2 className="text-[10px] font-mono font-bold text-brand-ink tracking-[0.2em] mb-8 border-b-2 border-brand-ink pb-4 uppercase flex items-center gap-3">
+            <h2 className="text-xs font-mono font-bold text-brand-ink tracking-[0.2em] mb-8 border-b-2 border-brand-ink pb-4 uppercase flex items-center gap-3">
               <Terminal className="w-4 h-4 text-brand-red" />
               Design Concept
             </h2>
@@ -123,7 +161,7 @@ export default function AboutSitePage() {
 
           {/* Tech Stack Details */}
           <section>
-            <h2 className="text-[10px] font-mono font-bold text-brand-ink tracking-[0.2em] mb-8 border-b-2 border-brand-ink pb-4 uppercase flex items-center gap-3">
+            <h2 className="text-xs font-mono font-bold text-brand-ink tracking-[0.2em] mb-8 border-b-2 border-brand-ink pb-4 uppercase flex items-center gap-3">
               <Code2 className="w-4 h-4 text-brand-red" />
               Technology Stack
             </h2>
@@ -141,12 +179,63 @@ export default function AboutSitePage() {
               ))}
             </div>
           </section>
+
+          {/* Recent Commits */}
+          <section>
+            <h2 className="text-xs font-mono font-bold text-brand-ink tracking-[0.2em] mb-8 border-b-2 border-brand-ink pb-4 uppercase flex items-center gap-3">
+              <Github className="w-4 h-4 text-brand-red" />
+              Recent Commits
+            </h2>
+            <div className="bg-brand-card border-2 border-brand-ink shadow-[8px_8px_0_0_var(--shadow)] divide-y-2 divide-brand-ink">
+              {commitsLoading ? (
+                <div className="p-8 text-center text-brand-ink-soft text-xs font-mono font-bold uppercase tracking-widest flex justify-center items-center gap-3">
+                  <div className="w-2 h-2 bg-brand-red animate-pulse" />
+                  LOADING_COMMITS...
+                </div>
+              ) : commits.length > 0 ? (
+                commits.map((commit) => (
+                  <a
+                    key={commit.sha}
+                    href={commit.html_url}
+                    target="_blank"
+                    className="block p-6 hover:bg-[#1c1c1c] group transition-colors"
+                  >
+                    <div className="flex items-center justify-between gap-4 mb-2">
+                      <h3 className="font-mono text-xs font-bold text-brand-ink group-hover:text-white transition-colors truncate">
+                        {commit.commit.message.split('\n')[0]}
+                      </h3>
+                      <span className="text-xs font-mono text-brand-ink-soft bg-brand-bg px-2 py-0.5 border border-brand-ink/20 group-hover:border-transparent group-hover:bg-brand-red group-hover:text-white transition-colors flex-shrink-0">
+                        {commit.sha.substring(0, 7)}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between mt-4">
+                      <div className="flex items-center gap-2">
+                        <div className="w-5 h-5 rounded-full bg-brand-bg border border-brand-ink flex items-center justify-center text-[8px] font-bold">
+                          {commit.commit.author.name.substring(0, 2).toUpperCase()}
+                        </div>
+                        <span className="text-xs font-display font-bold text-brand-ink-mid group-hover:text-white/70 transition-colors">
+                          {commit.commit.author.name}
+                        </span>
+                      </div>
+                      <span className="text-xs font-mono text-brand-ink-soft group-hover:text-white/50 transition-colors">
+                        {new Date(commit.commit.author.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+                      </span>
+                    </div>
+                  </a>
+                ))
+              ) : (
+                <div className="p-8 text-center text-brand-ink-soft text-xs font-mono">
+                  Unable to load recent commits.
+                </div>
+              )}
+            </div>
+          </section>
         </div>
 
         {/* Sidebar */}
         <aside className="space-y-12">
           <section>
-            <h2 className="text-[10px] font-mono font-bold text-brand-ink tracking-[0.2em] mb-6 border-b-2 border-brand-ink pb-4 uppercase flex items-center gap-3">
+            <h2 className="text-xs font-mono font-bold text-brand-ink tracking-[0.2em] mb-6 border-b-2 border-brand-ink pb-4 uppercase flex items-center gap-3">
               <Info className="w-4 h-4 text-brand-red" />
               Project Stats
             </h2>
@@ -158,7 +247,7 @@ export default function AboutSitePage() {
                 { label: 'ANIMATIONS', value: 'FRAMER MOTION' }
               ].map((stat, i) => (
                 <div key={i} className="p-4 bg-brand-card flex items-center justify-between">
-                  <p className="text-[9px] font-mono font-bold text-brand-ink-soft uppercase">{stat.label}</p>
+                  <p className="text-xs font-mono font-bold text-brand-ink-soft uppercase">{stat.label}</p>
                   <p className="text-xs font-display font-black text-brand-ink">{stat.value}</p>
                 </div>
               ))}
@@ -166,7 +255,7 @@ export default function AboutSitePage() {
           </section>
 
           <section>
-            <h2 className="text-[10px] font-mono font-bold text-brand-ink tracking-[0.2em] mb-6 border-b-2 border-brand-ink pb-4 uppercase flex items-center gap-3">
+            <h2 className="text-xs font-mono font-bold text-brand-ink tracking-[0.2em] mb-6 border-b-2 border-brand-ink pb-4 uppercase flex items-center gap-3">
               <Github className="w-4 h-4 text-brand-red" />
               Open Source
             </h2>

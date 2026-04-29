@@ -37,6 +37,7 @@ export default function AddNewProjectPage() {
   const [liveUrl, setLiveUrl] = useState('');
   const [icon, setIcon] = useState('');
   const [error, setError] = useState('');
+  const [isPublished, setIsPublished] = useState(true);
   const [isPublishing, setIsPublishing] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const fileDocInputRef = useRef<HTMLInputElement>(null);
@@ -70,7 +71,7 @@ export default function AddNewProjectPage() {
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
   </div>
   <div class="flex flex-col min-w-0 flex-1">
-    <span class="text-[10px] font-mono font-bold text-brand-ink-soft uppercase tracking-widest mb-1">Attached Document</span>
+    <span class="text-xs font-mono font-bold text-brand-ink-soft uppercase tracking-widest mb-1">Attached Document</span>
     <span class="truncate font-display font-bold text-brand-ink text-sm block w-full">${fileName}</span>
   </div>
 </a>
@@ -157,8 +158,8 @@ export default function AddNewProjectPage() {
           icon,
           features: cleanFeatures,
           tech: cleanTechStack,
-          github: githubUrl
-          // live_url is not saved yet as it's not in the DB schema
+          github: githubUrl,
+          is_published: isPublished
         })
       });
 
@@ -203,7 +204,7 @@ export default function AddNewProjectPage() {
           <motion.p
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-[10px] font-mono font-bold text-brand-ink-soft tracking-[0.3em] mb-4 uppercase"
+            className="text-xs font-mono font-bold text-brand-ink-soft tracking-[0.3em] mb-4 uppercase"
           >
             ADMIN_WORKSPACE // NEW_ENTRY
           </motion.p>
@@ -237,7 +238,7 @@ export default function AddNewProjectPage() {
 
           {/* Basic Info */}
           <section className="bg-brand-card border-2 border-brand-ink p-8 shadow-[8px_8px_0_0_var(--shadow)] space-y-6">
-            <h2 className="text-[10px] font-mono font-bold text-brand-ink tracking-[0.2em] border-b-2 border-brand-ink pb-4 uppercase flex items-center gap-3">
+            <h2 className="text-xs font-mono font-bold text-brand-ink tracking-[0.2em] border-b-2 border-brand-ink pb-4 uppercase flex items-center gap-3">
               <Terminal className="w-4 h-4 text-brand-red" />
               General Information
             </h2>
@@ -365,20 +366,39 @@ export default function AddNewProjectPage() {
         <aside className="space-y-8">
           {/* Metadata */}
           <section className="bg-brand-card border-2 border-brand-ink p-6 shadow-[6px_6px_0_0_var(--shadow)]">
-            <h3 className="text-[10px] font-mono font-bold text-brand-ink tracking-[0.2em] border-b-2 border-brand-ink pb-3 mb-4 uppercase">
+            <h3 className="text-xs font-mono font-bold text-brand-ink tracking-[0.2em] border-b-2 border-brand-ink pb-3 mb-4 uppercase">
+              Project Status
+            </h3>
+            <div className="flex items-center justify-between p-3 border-2 border-brand-ink bg-brand-bg">
+              <span className="text-xs font-mono font-bold text-brand-ink uppercase">Visibility</span>
+              <button
+                onClick={() => setIsPublished(!isPublished)}
+                className={`px-4 py-1.5 text-[10px] font-mono font-bold border-2 transition-all ${isPublished ? 'bg-brand-red text-white border-brand-red shadow-[2px_2px_0_0_#000]' : 'bg-gray-200 text-gray-500 border-gray-300'}`}
+              >
+                {isPublished ? 'PUBLISHED' : 'DISABLED'}
+              </button>
+            </div>
+            <p className="mt-2 text-[10px] text-brand-ink-soft italic leading-tight">
+              {isPublished ? 'Project is visible on the main page.' : 'Project is hidden from the main page.'}
+            </p>
+          </section>
+
+          {/* Links & Metadata */}
+          <section className="bg-brand-card border-2 border-brand-ink p-6 shadow-[6px_6px_0_0_var(--shadow)]">
+            <h3 className="text-xs font-mono font-bold text-brand-ink tracking-[0.2em] border-b-2 border-brand-ink pb-3 mb-4 uppercase">
               Links & Metadata
             </h3>
             <div className="space-y-4">
               <div>
-                <label className="block text-[10px] font-mono font-bold text-brand-ink-soft mb-1">GITHUB URL <span className="text-brand-red">*</span></label>
+                <label className="block text-xs font-mono font-bold text-brand-ink-soft mb-1">GITHUB URL <span className="text-brand-red">*</span></label>
                 <input type="text" value={githubUrl} onChange={(e) => setGithubUrl(e.target.value)} className="w-full bg-brand-bg border border-brand-ink p-2 text-xs font-mono outline-none focus:border-brand-red" placeholder="https://github.com/..." />
               </div>
               <div>
-                <label className="block text-[10px] font-mono font-bold text-brand-ink-soft mb-1">LIVE URL <span className="text-brand-red">*</span></label>
+                <label className="block text-xs font-mono font-bold text-brand-ink-soft mb-1">LIVE URL <span className="text-brand-red">*</span></label>
                 <input type="text" value={liveUrl} onChange={(e) => setLiveUrl(e.target.value)} className="w-full bg-brand-bg border border-brand-ink p-2 text-xs font-mono outline-none focus:border-brand-red" placeholder="https://..." />
               </div>
               <div>
-                <label className="block text-[10px] font-mono font-bold text-brand-ink-soft mb-1">ICON NAME (Lucide) <span className="text-brand-red">*</span></label>
+                <label className="block text-xs font-mono font-bold text-brand-ink-soft mb-1">ICON NAME (Lucide) <span className="text-brand-red">*</span></label>
                 <input type="text" value={icon} onChange={(e) => setIcon(e.target.value)} className="w-full bg-brand-bg border border-brand-ink p-2 text-xs font-mono outline-none focus:border-brand-red" placeholder="e.g. layout, layers, box" />
               </div>
             </div>
@@ -387,7 +407,7 @@ export default function AddNewProjectPage() {
           {/* Features */}
           <section className="bg-brand-card border-2 border-brand-ink p-6 shadow-[6px_6px_0_0_var(--shadow)]">
             <div className="flex items-center justify-between border-b-2 border-brand-ink pb-3 mb-4">
-              <h3 className="text-[10px] font-mono font-bold text-brand-ink tracking-[0.2em] uppercase">Features</h3>
+              <h3 className="text-xs font-mono font-bold text-brand-ink tracking-[0.2em] uppercase">Features</h3>
               <button onClick={handleAddFeature} className="text-brand-red hover:bg-brand-red/10 p-1 rounded transition-colors" title="Add Feature">
                 <Plus className="w-4 h-4" />
               </button>
@@ -395,7 +415,7 @@ export default function AddNewProjectPage() {
             <div className="space-y-3">
               {features.map((feature, i) => (
                 <div key={i} className="flex items-start gap-2">
-                  <span className="text-[10px] font-mono text-brand-ink-soft mt-2.5">{i + 1}.</span>
+                  <span className="text-xs font-mono text-brand-ink-soft mt-2.5">{i + 1}.</span>
                   <input
                     type="text"
                     value={feature}
@@ -414,7 +434,7 @@ export default function AddNewProjectPage() {
           {/* Tech Stack */}
           <section className="bg-brand-card border-2 border-brand-ink p-6 shadow-[6px_6px_0_0_var(--shadow)]">
             <div className="flex items-center justify-between border-b-2 border-brand-ink pb-3 mb-4">
-              <h3 className="text-[10px] font-mono font-bold text-brand-ink tracking-[0.2em] uppercase">Tech Stack</h3>
+              <h3 className="text-xs font-mono font-bold text-brand-ink tracking-[0.2em] uppercase">Tech Stack</h3>
               <button onClick={handleAddTech} className="text-brand-red hover:bg-brand-red/10 p-1 rounded transition-colors" title="Add Tech">
                 <Plus className="w-4 h-4" />
               </button>

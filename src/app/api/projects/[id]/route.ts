@@ -30,6 +30,7 @@ export async function GET(
       features: data.features,
       tech: data.tech,
       github: data.github,
+      isPublished: data.is_published,
       contributors: (data.contributors || []).map((c: any) => ({
         name: c.name,
         github: c.github
@@ -49,11 +50,11 @@ export async function PUT(
   try {
     const { id } = await params;
     const body = await request.json();
-    const { num, title, description, long_desc, icon, features, tech, github } = body;
+    const { num, title, description, long_desc, icon, features, tech, github, is_published } = body;
 
     const { data, error } = await supabase
       .from('projects')
-      .update({ num, title, description, long_desc, icon, features, tech, github })
+      .update({ num, title, description, long_desc, icon, features, tech, github, is_published })
       .eq('id', id)
       .select();
 

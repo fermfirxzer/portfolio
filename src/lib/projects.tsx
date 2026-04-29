@@ -17,6 +17,7 @@ export interface Project {
   tech: string[];
   github: string;
   contributors: Contributor[];
+  isPublished: boolean;
 }
 
 export const projects: Project[] = [
@@ -39,7 +40,8 @@ export const projects: Project[] = [
     contributors: [
       { name: 'fermfirxzer', github: 'https://github.com/fermfirxzer' },
       { name: 'jirayus', github: 'https://github.com/fermfirxzer' }
-    ]
+    ],
+    isPublished: true
   },
   {
     id: 'novel-platform',
@@ -60,7 +62,8 @@ export const projects: Project[] = [
     contributors: [
       { name: 'fermfirxzer', github: 'https://github.com/fermfirxzer' },
       { name: 's6504062630057', github: 'https://github.com/s6504062630057' }
-    ]
+    ],
+    isPublished: true
   },
   {
     id: 'numerical-calculator',
@@ -79,7 +82,8 @@ export const projects: Project[] = [
     github: 'https://github.com/fermfirxzer',
     contributors: [
       { name: 'fermfirxzer', github: 'https://github.com/fermfirxzer' }
-    ]
+    ],
+    isPublished: true
   }
 ];
 
