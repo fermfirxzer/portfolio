@@ -1,0 +1,30 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #fafaf8;
+  --card: #ffffff;
+  --ink: #1c1c1c;
+  --ink-mid: #4a4a4a;
+  --ink-soft: #7a7a7a;
+  --rule: #d8d7d0;
+  --shadow: #c8c7bf;
+}
+
+[data-theme='dark'] {
+  --bg: #0f0f0f;
+  --card: #1a1a1a;
+  --ink: #f0f0f0;
+  --ink-mid: #a0a0a0;
+  --ink-soft: #666666;
+  --rule: #333333;
+  --shadow: #000000;
+}
+
+@layer base {
+  body {
+    @apply bg-brand-bg text-brand-ink font-sans antialiased selection:bg-brand-red selection:text-white transition-colors duration-300;
+  }
+}
