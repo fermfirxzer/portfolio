@@ -69,6 +69,35 @@ export const translations = {
     },
     footer: {
       copy: '© 2026 JIRAYUS MOOLSART. BUILT WITH TYPE-SAFE COMPONENTS.'
+    },
+    about_info: {
+      back: 'BACK_TO_HOME',
+      repo: '[ REPO ↗ ]',
+      meta: 'META_INFORMATION',
+      title: 'ABOUT THIS <br /> ARCHITECTURE',
+      design: {
+        title: 'Design Concept',
+        p1: 'This portfolio is designed with a "Retro-Futuristic Brutalist" aesthetic, inspired by early computer interfaces and modern high-contrast design systems.',
+        p2: "The objective was to create a digital CV that doesn't just list skills but demonstrates them through performance, accessibility, and unique visual identity. It features a custom theme engine, responsive layouts, and type-safe data fetching.",
+        p3: 'Furthermore, this project embraces "Vibe Coding", having been built in active collaboration with the Antigravity UI Architect AI agent. This advanced agentic approach allowed for rapid prototyping and iteration—blending production-grade code quality with striking aesthetics and flawless user experience.'
+      },
+      tech: {
+        title: 'Technology Stack'
+      },
+      commits: {
+        title: 'Recent Commits',
+        loading: 'LOADING_COMMITS...',
+        error: 'Unable to load recent commits.'
+      },
+      stats: {
+        title: 'Project Stats'
+      },
+      open_source: {
+        title: 'Open Source',
+        desc: 'Want to see how this was built? The entire codebase is available on GitHub.',
+        button: 'REPOSITORY ↗'
+      },
+      return: 'RETURN_TO_PORTFOLIO'
     }
   },
   th: {
@@ -139,6 +168,35 @@ export const translations = {
     },
     footer: {
       copy: '© 2569 จิรายุส มูลศาสตร์. สร้างด้วยส่วนประกอบที่ปลอดภัยต่อชนิดข้อมูล'
+    },
+    about_info: {
+      back: 'กลับสู่หน้าหลัก',
+      repo: '[ ดูซอร์สโค้ด ↗ ]',
+      meta: 'ข้อมูลเมตา',
+      title: 'เกี่ยวกับ <br /> สถาปัตยกรรมนี้',
+      design: {
+        title: 'แนวคิดการออกแบบ',
+        p1: 'พอร์ตโฟลิโอนี้ได้รับการออกแบบด้วยสไตล์ "Retro-Futuristic Brutalist" ซึ่งได้รับแรงบันดาลใจจากอินเทอร์เฟซคอมพิวเตอร์ยุคแรกและระบบการออกแบบที่มีความเปรียบต่างสูงในปัจจุบัน',
+        p2: 'วัตถุประสงค์คือการสร้าง CV ดิจิทัลที่ไม่เพียงแค่แสดงทักษะ แต่ยังสาธิตทักษะเหล่านั้นผ่านประสิทธิภาพ การเข้าถึง และเอกลักษณ์ทางภาพที่เป็นเอกลักษณ์ มีระบบธีมที่กำหนดเอง เลย์เอาต์ที่ตอบสนอง และการดึงข้อมูลที่ปลอดภัยต่อชนิดข้อมูล',
+        p3: 'นอกจากนี้ โปรเจกต์นี้ยังใช้แนวคิด "Vibe Coding" โดยสร้างขึ้นจากการทำงานร่วมกันอย่างใกล้ชิดกับ AI เอเจนต์ Antigravity UI Architect แนวทางเอเจนต์ขั้นสูงนี้ช่วยให้สามารถสร้างต้นแบบและทำซ้ำได้อย่างรวดเร็ว โดยผสมผสานคุณภาพโค้ดระดับการใช้งานจริงเข้ากับความสวยงามที่โดดเด่นและประสบการณ์ผู้ใช้งานที่ไร้ที่ติ'
+      },
+      tech: {
+        title: 'เทคโนโลยีที่ใช้'
+      },
+      commits: {
+        title: 'การอัปเดตล่าสุด',
+        loading: 'กำลังโหลดข้อมูลการอัปเดต...',
+        error: 'ไม่สามารถโหลดข้อมูลการอัปเดตได้'
+      },
+      stats: {
+        title: 'สถิติโปรเจกต์'
+      },
+      open_source: {
+        title: 'โอเพนซอร์ส',
+        desc: 'อยากเห็นว่าสิ่งนี้ถูกสร้างขึ้นมาได้อย่างไร? โค้ดทั้งหมดมีให้ดูบน GitHub',
+        button: 'คลังเก็บซอร์สโค้ด ↗'
+      },
+      return: 'กลับสู่หน้าพอร์ตโฟลิโอ'
     }
   },
   jp: {
@@ -209,6 +267,35 @@ export const translations = {
     },
     footer: {
       copy: '© 2026 JIRAYUS MOOLSART. 型安全なコンポーネントで構築。'
+    },
+    about_info: {
+      back: 'ホームに戻る',
+      repo: '[ リポジトリ ↗ ]',
+      meta: 'メタ情報',
+      title: 'このアーキテクチャ <br /> について',
+      design: {
+        title: 'デザインコンセプト',
+        p1: 'このポートフォリオは、初期のコンピュータインターフェースと現代の高コントラストなデザインシステムからインスピレーションを得た「レトロ・フューチャリスティック・ブルータリズム」の美学でデザインされています。',
+        p2: '目的は、単にスキルを羅列するだけでなく、パフォーマンス、アクセシビリティ、そしてユニークな視覚的アイデンティティを通じてスキルを実証するデジタルCVを作成することでした。カスタムテーマエンジン、レスポンシブレイアウト、型安全なデータフェッチを備えています。',
+        p3: 'さらに、このプロジェクトは「Vibe Coding」を取り入れ、Antigravity UI Architect AIエージェントとの積極的なコラボレーションによって構築されました。この高度なエージェントアプローチにより、本番環境レベルのコード品質と印象的な美学、そして完璧なユーザーエクスペリエンスを融合させた迅速なプロトタイピングとイテレーションが可能になりました。'
+      },
+      tech: {
+        title: '技術スタック'
+      },
+      commits: {
+        title: '最近のコミット',
+        loading: 'コミットを読み込み中...',
+        error: '最近のコミットを読み込めませんでした。'
+      },
+      stats: {
+        title: 'プロジェクト統計'
+      },
+      open_source: {
+        title: 'オープンソース',
+        desc: 'これがどのように構築されたか見てみませんか？ 全コードはGitHubで公開されています。',
+        button: 'リポジトリ ↗'
+      },
+      return: 'ポートフォリオに戻る'
     }
   }
 };

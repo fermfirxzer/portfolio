@@ -17,7 +17,7 @@ import {
 } from 'lucide-react';
 import { motion } from 'motion/react';
 import Link from 'next/link';
-import { Language, translations } from '@/lib/i18n';
+import { useLanguage } from '@/context/LanguageContext';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 
 interface Commit {
@@ -34,8 +34,7 @@ interface Commit {
 
 export default function AboutSitePage() {
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
-  const [lang, setLang] = useState<Language>('en');
-  const t = translations[lang];
+  const { lang, setLang, t } = useLanguage();
   const [commits, setCommits] = useState<Commit[]>([]);
   const [commitsLoading, setCommitsLoading] = useState(true);
 
@@ -58,8 +57,6 @@ export default function AboutSitePage() {
 
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme') as 'light' | 'dark';
-    const savedLang = localStorage.getItem('lang') as Language;
-    if (savedLang) setLang(savedLang);
     if (savedTheme) {
       setTheme(savedTheme);
       document.documentElement.setAttribute('data-theme', savedTheme);
@@ -88,7 +85,7 @@ export default function AboutSitePage() {
       <nav className="fixed top-0 left-0 right-0 z-50 bg-[#1c1c1c] px-6 lg:px-12 h-16 flex items-center justify-between border-b-4 border-[#1c1c1c]">
         <Link href="/" className="flex items-center gap-3 text-white font-display font-bold tracking-wider hover:text-brand-red transition-colors group">
           <ChevronLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-          BACK_TO_HOME
+          {t('about_info.back')}
         </Link>
         <div className="flex items-center gap-6">
           <button
@@ -98,13 +95,13 @@ export default function AboutSitePage() {
           >
             {theme === 'light' ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
           </button>
-          <LanguageSwitcher lang={lang} setLang={setLang} />
+          <LanguageSwitcher />
           <a
             href="https://github.com/fermfirxzer/portfolio-v2" 
             target="_blank"
             className="bg-brand-red text-white px-4 py-1.5 text-xs font-mono font-bold hover:bg-white hover:text-[#1c1c1c] transition-all shadow-[4px_4px_0_0_#000]"
           >
-            [ REPO ↗ ]
+            {t('about_info.repo')}
           </a>
         </div>
       </nav>
@@ -118,7 +115,7 @@ export default function AboutSitePage() {
             animate={{ opacity: 1, y: 0 }}
             className="text-xs font-mono font-bold text-brand-ink-soft tracking-[0.3em] mb-4 uppercase"
           >
-            META_INFORMATION
+            {t('about_info.meta')}
           </motion.p>
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
@@ -126,7 +123,7 @@ export default function AboutSitePage() {
             transition={{ delay: 0.1 }}
             className="text-4xl md:text-6xl font-display font-black leading-tight mb-8"
           >
-            ABOUT THIS <br /> ARCHITECTURE
+            {t('about_info.title')}
           </motion.h1>
           <motion.div
             initial={{ scaleX: 0 }}
@@ -144,17 +141,17 @@ export default function AboutSitePage() {
           <section>
             <h2 className="text-xs font-mono font-bold text-brand-ink tracking-[0.2em] mb-8 border-b-2 border-brand-ink pb-4 uppercase flex items-center gap-3">
               <Terminal className="w-4 h-4 text-brand-red" />
-              Design Concept
+              {t('about_info.design.title')}
             </h2>
             <div className="bg-brand-card border-2 border-brand-ink p-8 shadow-[8px_8px_0_0_var(--shadow)] space-y-6">
               <p className="text-lg font-medium leading-relaxed text-brand-ink-mid">
-                This portfolio is designed with a <span className="text-brand-red font-bold">"Retro-Futuristic Brutalist"</span> aesthetic, inspired by early computer interfaces and modern high-contrast design systems.
+                {t('about_info.design.p1')}
               </p>
               <p className="text-brand-ink-mid leading-relaxed">
-                The objective was to create a digital CV that doesn't just list skills but demonstrates them through performance, accessibility, and unique visual identity. It features a custom theme engine, responsive layouts, and type-safe data fetching.
+                {t('about_info.design.p2')}
               </p>
               <p className="text-brand-ink-mid leading-relaxed p-4 bg-brand-bg border border-brand-ink/20 rounded-sm">
-                Furthermore, this project embraces <span className="text-brand-red font-bold">"Vibe Coding"</span>, having been built in active collaboration with the <span className="font-bold text-brand-ink">Antigravity UI Architect</span> AI agent. This advanced agentic approach allowed for rapid prototyping and iteration—blending production-grade code quality with striking aesthetics and flawless user experience.
+                {t('about_info.design.p3')}
               </p>
             </div>
           </section>
@@ -163,7 +160,7 @@ export default function AboutSitePage() {
           <section>
             <h2 className="text-xs font-mono font-bold text-brand-ink tracking-[0.2em] mb-8 border-b-2 border-brand-ink pb-4 uppercase flex items-center gap-3">
               <Code2 className="w-4 h-4 text-brand-red" />
-              Technology Stack
+              {t('about_info.tech.title')}
             </h2>
             <div className="grid sm:grid-cols-2 gap-4">
               {techStack.map((tech, i) => (
@@ -180,17 +177,17 @@ export default function AboutSitePage() {
             </div>
           </section>
 
-          {/* Recent Commits */}
+          {/* {t('about_info.commits.title')} */}
           <section>
             <h2 className="text-xs font-mono font-bold text-brand-ink tracking-[0.2em] mb-8 border-b-2 border-brand-ink pb-4 uppercase flex items-center gap-3">
               <Github className="w-4 h-4 text-brand-red" />
-              Recent Commits
+              {t('about_info.commits.title')}
             </h2>
             <div className="bg-brand-card border-2 border-brand-ink shadow-[8px_8px_0_0_var(--shadow)] divide-y-2 divide-brand-ink">
               {commitsLoading ? (
                 <div className="p-8 text-center text-brand-ink-soft text-xs font-mono font-bold uppercase tracking-widest flex justify-center items-center gap-3">
                   <div className="w-2 h-2 bg-brand-red animate-pulse" />
-                  LOADING_COMMITS...
+                  {t('about_info.commits.loading')}
                 </div>
               ) : commits.length > 0 ? (
                 commits.map((commit) => (
@@ -225,7 +222,7 @@ export default function AboutSitePage() {
                 ))
               ) : (
                 <div className="p-8 text-center text-brand-ink-soft text-xs font-mono">
-                  Unable to load recent commits.
+                  {t('about_info.commits.error')}
                 </div>
               )}
             </div>
@@ -237,7 +234,7 @@ export default function AboutSitePage() {
           <section>
             <h2 className="text-xs font-mono font-bold text-brand-ink tracking-[0.2em] mb-6 border-b-2 border-brand-ink pb-4 uppercase flex items-center gap-3">
               <Info className="w-4 h-4 text-brand-red" />
-              Project Stats
+              {t('about_info.stats.title')}
             </h2>
             <div className="flex flex-col border-2 border-brand-ink divide-y-2 divide-brand-ink shadow-[6px_6px_0_0_var(--shadow)]">
               {[
@@ -257,16 +254,16 @@ export default function AboutSitePage() {
           <section>
             <h2 className="text-xs font-mono font-bold text-brand-ink tracking-[0.2em] mb-6 border-b-2 border-brand-ink pb-4 uppercase flex items-center gap-3">
               <Github className="w-4 h-4 text-brand-red" />
-              Open Source
+              {t('about_info.open_source.title')}
             </h2>
             <div className="bg-brand-card border-2 border-brand-ink p-6 shadow-[6px_6px_0_0_var(--shadow)] text-center">
-              <p className="text-xs text-brand-ink-mid mb-6 font-medium">Want to see how this was built? The entire codebase is available on GitHub.</p>
+              <p className="text-xs text-brand-ink-mid mb-6 font-medium">{t('about_info.open_source.desc')}</p>
               <a 
                 href="https://github.com/fermfirxzer/portfolio-v2"
                 target="_blank"
                 className="inline-flex items-center gap-2 bg-[#1c1c1c] text-white px-6 py-3 text-xs font-display font-bold tracking-widest hover:bg-brand-red transition-colors w-full justify-center"
               >
-                <Github className="w-4 h-4" /> REPOSITORY ↗
+                <Github className="w-4 h-4" /> {t('about_info.open_source.button')}
               </a>
             </div>
           </section>
@@ -277,7 +274,7 @@ export default function AboutSitePage() {
       <div className="max-w-5xl mx-auto px-6 lg:px-12 mt-24">
         <Link href="/" className="inline-flex items-center gap-3 bg-brand-card border-2 border-brand-ink px-6 py-3 font-mono font-bold text-xs tracking-widest hover:translate-x-1 hover:shadow-none shadow-[4px_4px_0_0_var(--shadow)] transition-all">
           <ChevronLeft className="w-4 h-4" />
-          RETURN_TO_PORTFOLIO
+          {t('about_info.return')}
         </Link>
       </div>
     </div>

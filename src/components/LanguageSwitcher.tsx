@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Language } from '@/lib/i18n';
+import { useLanguage } from '@/context/LanguageContext';
 import { ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -9,7 +9,8 @@ const languages: { code: Language; label: string; flag: string }[] = [
   { code: 'jp', label: '日本語', flag: 'https://flagcdn.com/w40/jp.png' },
 ];
 
-export default function LanguageSwitcher({ lang, setLang }: { lang: Language; setLang: (l: Language) => void }) {
+export default function LanguageSwitcher() {
+  const { lang, setLang } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -51,7 +52,6 @@ export default function LanguageSwitcher({ lang, setLang }: { lang: Language; se
                 key={l.code}
                 onClick={() => {
                   setLang(l.code);
-                  localStorage.setItem('lang', l.code);
                   setIsOpen(false);
                 }}
                 className={`w-full flex items-center gap-3 px-4 py-3 text-xs font-mono font-bold text-left hover:bg-brand-ink hover:text-brand-card transition-all ${

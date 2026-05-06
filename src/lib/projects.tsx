@@ -88,11 +88,12 @@ export const projects: Project[] = [
 ];
 
 export const getIcon = (icon: string) => {
+  const cls = "w-6 h-6 text-brand-red transition-colors duration-200";
   switch (icon) {
-    case 'layout': return <Layout className="w-10 h-10 text-brand-red" />;
-    case 'layers': return <Layers className="w-10 h-10 text-brand-red" />;
-    case 'box': return <Box className="w-10 h-10 text-brand-red" />;
-    default: return <Box className="w-10 h-10 text-brand-red" />;
+    case 'layout': return <Layout className={cls} />;
+    case 'layers': return <Layers className={cls} />;
+    case 'box': return <Box className={cls} />;
+    default: return <Box className={cls} />;
   }
 };
 
@@ -100,10 +101,14 @@ export async function fetchProjects() {
   try {
     const response = await fetch('/api/projects');
     if (!response.ok) throw new Error('Failed to fetch projects');
-    const data = await response.json() as Project[];
-    if (data && data.length > 0) return data;
-    // Fallback to local mock data if DB is empty
-    return projects;
+    const dbData = await response.json() as Project[];
+
+    if (!dbData || dbData.length === 0) return projects;
+
+    // Local projects take priority; DB-only projects are appended after
+    const localIds = new Set(projects.map(p => p.id));
+    const dbOnly = dbData.filter(p => !localIds.has(p.id));
+    return [...projects, ...dbOnly];
   } catch (error) {
     console.error('Error fetching projects, falling back to local data:', error);
     return projects;
@@ -111,15 +116,19 @@ export async function fetchProjects() {
 }
 
 export async function fetchProjectById(id: string) {
+  // Check local data first
+  const localProject = projects.find(p => p.id === id);
+  if (localProject) return localProject;
+
+  // Not in local — try fetching from DB
   try {
     const response = await fetch(`/api/projects/${id}`);
     if (!response.ok) throw new Error('Project not found');
     const data = await response.json() as Project;
     if (data && data.id) return data;
-    // Fallback to local mock data if DB is empty
-    return projects.find(p => p.id === id) || null;
+    return null;
   } catch (error) {
-    console.error('Error fetching project, falling back to local data:', error);
-    return projects.find(p => p.id === id) || null;
+    console.error('Error fetching project from DB:', error);
+    return null;
   }
 }

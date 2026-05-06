@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { Project, fetchProjectById, getIcon } from '@/lib/projects';
+import { supabase } from '@/lib/supabase';
 import {
   Github,
   ChevronLeft,
@@ -14,7 +15,7 @@ import {
 } from 'lucide-react';
 import { motion } from 'motion/react';
 import Link from 'next/link';
-import { Language } from '@/lib/i18n';
+import { useLanguage } from '@/context/LanguageContext';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 
 export default function ProjectPage() {
@@ -24,8 +25,9 @@ export default function ProjectPage() {
   const [project, setProject] = useState<Project | null>(null);
   const [loading, setLoading] = useState(true);
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
-  const [lang, setLang] = useState<Language>('en');
+  const { lang, setLang } = useLanguage();
   const [progress, setProgress] = useState(0);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
     if (loading) {
@@ -54,12 +56,24 @@ export default function ProjectPage() {
 
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme') as 'light' | 'dark';
-    const savedLang = localStorage.getItem('lang') as Language;
-    if (savedLang) setLang(savedLang);
     if (savedTheme) {
       setTheme(savedTheme);
       document.documentElement.setAttribute('data-theme', savedTheme);
     }
+  }, []);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setIsLoggedIn(!!session);
+    };
+    checkAuth();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsLoggedIn(!!session);
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
   const toggleTheme = () => {
@@ -117,7 +131,7 @@ export default function ProjectPage() {
           >
             {theme === 'light' ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
           </button>
-          <LanguageSwitcher lang={lang} setLang={setLang} />
+          <LanguageSwitcher />
           <a
             href="#contact"
             className="bg-white text-[#1c1c1c] px-4 py-1.5 text-xs font-mono font-bold hover:bg-brand-red hover:text-white transition-all shadow-[4px_4px_0_0_#d63b2a]"
@@ -139,12 +153,14 @@ export default function ProjectPage() {
             <p className="text-xs font-mono font-bold text-brand-ink-soft tracking-[0.3em] uppercase">
               {project.num}
             </p>
-            <Link 
-              href={`/admin/projects/${project.id}`}
-              className="text-xs font-mono font-bold text-brand-ink-soft border border-brand-ink/20 px-2 py-1 hover:bg-brand-ink hover:text-brand-card transition-colors uppercase"
-            >
-              [ EDIT PROJECT ]
-            </Link>
+            {isLoggedIn && (
+              <Link 
+                href={`/admin/projects/${project.id}`}
+                className="text-xs font-mono font-bold text-brand-ink-soft border border-brand-ink/20 px-2 py-1 hover:bg-brand-ink hover:text-brand-card transition-colors uppercase"
+              >
+                [ EDIT PROJECT ]
+              </Link>
+            )}
           </motion.div>
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
