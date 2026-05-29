@@ -6,6 +6,14 @@ export interface Contributor {
   github: string;
 }
 
+export interface ProjectFeature {
+  id: string;
+  title: string;
+  summary?: string;
+  detail?: string;
+  image?: string | null;
+}
+
 export interface Project {
   id: string;
   num: string;
@@ -13,11 +21,29 @@ export interface Project {
   description: string;
   longDesc: string;
   icon: 'layout' | 'layers' | 'box';
+  iconUrl?: string | null;
   features: string[];
+  featureDetails?: ProjectFeature[];
   tech: string[];
   github: string;
+  liveUrl?: string;
+  createdAt?: string;
   contributors: Contributor[];
   isPublished: boolean;
+}
+
+/** Normalize features for list + detail UI */
+export function getProjectFeatures(project: Project): ProjectFeature[] {
+  if (project.featureDetails?.length) {
+    return project.featureDetails;
+  }
+  return project.features.map((title, i) => ({
+    id: `${project.id}-feature-${i}`,
+    title,
+    summary: title,
+    detail: title,
+    image: null,
+  }));
 }
 
 export const projects: Project[] = [
@@ -28,6 +54,7 @@ export const projects: Project[] = [
     description: 'A full-stack movie platform with seat selection and stripe payments.',
     longDesc: 'Complete web application for browsing movies, selecting seats, managing showtimes, and purchasing tickets with real payment processing and QR verification.',
     icon: 'layout',
+    iconUrl: '/projects/movie_ticket/icon.png',
     features: [
       'Movie browsing with showtime scheduling',
       'Interactive seat selection map',
@@ -35,8 +62,60 @@ export const projects: Project[] = [
       'QR-based ticket verification system',
       'Admin dashboard for showtime management'
     ],
+    featureDetails: [
+      {
+        id: 'movie-browse',
+        title: 'Movie browsing & showtimes',
+        summary: 'Browse films, posters, and available showtimes in one flow.',
+        detail:
+          'The home experience lets users explore currently showing movies with clear poster art, ratings, and quick access to schedules. Each movie page surfaces upcoming showtimes by date and auditorium so users can compare options before booking.\n\nThe layout is built for fast scanning on desktop and mobile, with responsive grids and consistent typography across the booking journey.',
+        image: '/projects/movie_ticket/main-page.png',
+      },
+      {
+        id: 'seat-selection',
+        title: 'Interactive seat selection',
+        summary: 'Visual seat map with real-time availability.',
+        detail:
+          'Users pick seats from an interactive auditorium map that reflects available, held, and booked seats. The UI highlights the selected seats, shows pricing context, and prevents double-booking by validating selection server-side before checkout.\n\nThis feature focuses on clarity—large touch targets, strong contrast for seat states, and immediate feedback when a seat is taken.',
+        image: '/projects/movie_ticket/seat-selection.png',
+      },
+      {
+        id: 'stripe-payment',
+        title: 'Secure Stripe checkout',
+        summary: 'Card payments handled through Stripe with a polished checkout step.',
+        detail:
+          'Ticket purchases go through Stripe for secure card processing. The checkout step summarizes showtime, seats, and total price before payment, reducing mistakes and abandoned carts.\n\nPayment state is tracked so successful bookings can generate tickets and failed payments can be handled gracefully without losing the user’s seat hold.',
+        image: '/projects/movie_ticket/stripe-payment.png',
+      },
+      {
+        id: 'ticket-qr',
+        title: 'Ticket purchase & QR verification',
+        summary: 'Complete purchase flow with ticket output for entry verification.',
+        detail:
+          'After payment, users receive a digital ticket they can present at the cinema. The buy-ticket flow confirms booking details and prepares verification data (such as QR codes) so staff or systems can validate entry quickly.\n\nThis closes the loop from browsing → seats → pay → proof of purchase.',
+        image: '/projects/movie_ticket/buy%20ticket.png',
+      },
+      {
+        id: 'booking-history',
+        title: 'Booking history',
+        summary: 'Past bookings and ticket access in one place.',
+        detail:
+          'Signed-in users can review previous bookings from a history view—useful for re-opening tickets, checking showtimes, or confirming past payments. The screen keeps a clean record-oriented layout with status cues and quick navigation back to active tickets.',
+        image: '/projects/movie_ticket/history.png',
+      },
+      {
+        id: 'showtime-admin',
+        title: 'Showtime management',
+        summary: 'Schedule and manage showtimes behind the scenes.',
+        detail:
+          'Administrators can configure showtimes tied to movies and auditoriums. The showtime UI supports operational workflows like adding slots, aligning capacity with seat maps, and keeping the public browse experience in sync with what is actually bookable.',
+        image: '/projects/movie_ticket/showtime.png',
+      },
+    ],
     tech: ['Next.js', 'Tailwind CSS', 'MongoDB', 'Stripe', 'Vercel'],
     github: 'https://github.com/fermfirxzer',
+    liveUrl: 'https://movie-ticket-nextjs-projects.vercel.app/',
+    createdAt: '2026-04-29T13:18:39.365891+00:00',
     contributors: [
       { name: 'fermfirxzer', github: 'https://github.com/fermfirxzer' },
       { name: 'jirayus', github: 'https://github.com/fermfirxzer' }
@@ -59,6 +138,8 @@ export const projects: Project[] = [
     ],
     tech: ['React.js', 'Node.js', 'Express', 'Bootstrap'],
     github: 'https://github.com/fermfirxzer',
+    liveUrl: '',
+    createdAt: '2026-04-29T13:18:39.365891+00:00',
     contributors: [
       { name: 'fermfirxzer', github: 'https://github.com/fermfirxzer' },
       { name: 's6504062630057', github: 'https://github.com/s6504062630057' }
@@ -80,6 +161,30 @@ export const projects: Project[] = [
     ],
     tech: ['React.js', 'Chart.js', 'Tailwind CSS'],
     github: 'https://github.com/fermfirxzer',
+    liveUrl: '',
+    createdAt: '2026-04-29T13:18:39.365891+00:00',
+    contributors: [
+      { name: 'fermfirxzer', github: 'https://github.com/fermfirxzer' }
+    ],
+    isPublished: true
+  },
+  {
+    id: 'java-mining-game',
+    num: 'PROJECT_04',
+    title: 'JAVA MINING GAME (Object Oriented Programming Subject)',
+    description: 'Java desktop mining game project focused on object-oriented design and interactive gameplay logic.',
+    longDesc: 'JAVA 2 MINING GAME is a Java-based game project developed using object-oriented programming principles, featuring interactive gameplay mechanics, player actions, and game logic implementation. The project demonstrates core Java concepts such as classes, inheritance, encapsulation, and event handling while creating a simple and engaging desktop game experience.',
+    icon: 'box',
+    features: [
+      'Object-oriented architecture with reusable game entities',
+      'Interactive desktop gameplay mechanics',
+      'Core Java concepts: inheritance, encapsulation, and event handling',
+      'Structured game loop and player action controls'
+    ],
+    tech: ['Java', 'OOP', 'Desktop UI'],
+    github: 'https://github.com/fermfirxzer/JAVA_GAME',
+    liveUrl: '',
+    createdAt: '2026-04-29T21:48:46.710977+00:00',
     contributors: [
       { name: 'fermfirxzer', github: 'https://github.com/fermfirxzer' }
     ],
@@ -97,24 +202,6 @@ export const getIcon = (icon: string) => {
   }
 };
 
-export async function fetchProjects() {
-  try {
-    const response = await fetch('/api/projects');
-    if (!response.ok) throw new Error('Failed to fetch projects');
-    const dbData = await response.json() as Project[];
-
-    if (!dbData || dbData.length === 0) return projects;
-
-    // Local projects take priority; DB-only projects are appended after
-    const localIds = new Set(projects.map(p => p.id));
-    const dbOnly = dbData.filter(p => !localIds.has(p.id));
-    return [...projects, ...dbOnly];
-  } catch (error) {
-    console.error('Error fetching projects, falling back to local data:', error);
-    return projects;
-  }
-}
-
 export async function fetchProjectById(id: string) {
   // Check local data first
   const localProject = projects.find(p => p.id === id);
@@ -131,4 +218,8 @@ export async function fetchProjectById(id: string) {
     console.error('Error fetching project from DB:', error);
     return null;
   }
+}
+
+export function getProjectLink(project: Project) {
+  return project.liveUrl?.trim() || project.github;
 }

@@ -1,23 +1,23 @@
 'use client';
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Github, ExternalLink, GraduationCap, Star, ChevronRight, Sun, Moon, MapPin, Mail, Phone } from 'lucide-react';
-import { motion } from 'motion/react';
+import { Github, ExternalLink, GraduationCap, Star, ChevronRight, ChevronDown, Sun, Moon, MapPin, Mail, Phone } from 'lucide-react';
+import { AnimatePresence, motion } from 'motion/react';
 import Link from 'next/link';
-import { Project, fetchProjects, getIcon } from '@/lib/projects';
+import { Project, projects } from '@/lib/projects';
 import { supabase } from '@/lib/supabase';
 import { useLanguage } from '@/context/LanguageContext';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
+import ProjectDetailDrawer, { ProjectIcon } from '@/components/ProjectDetailDrawer';
 
 const fadeUp = { initial: { opacity: 0, y: 40 }, whileInView: { opacity: 1, y: 0 }, viewport: { once: true, amount: 0.1 }, transition: { duration: 0.6, ease: 'easeOut' } };
 
 export default function Page() {
-  const [theme, setTheme] = useState<'light' | 'dark'>('light');
+  const [theme, setTheme] = useState<'light' | 'dark'>('dark');
   const { tObj: t } = useLanguage();
-  const [projectList, setProjectList] = useState<Project[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [currentPage, setCurrentPage] = useState(1);
-  const projectsPerPage = 6;
+  const [projectList] = useState<Project[]>(projects);
+  const [activeProject, setActiveProject] = useState<Project | null>(null);
+  const [activeProfileItem, setActiveProfileItem] = useState<number | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   // Split-reveal: draggable vertical line inside hero
@@ -26,12 +26,10 @@ export default function Page() {
   const draggingLine = useRef(false);
 
   useEffect(() => {
-    fetchProjects().then(data => { setProjectList(data); setLoading(false); });
-  }, []);
-
-  useEffect(() => {
     const saved = localStorage.getItem('theme') as 'light' | 'dark';
-    if (saved) { setTheme(saved); document.documentElement.setAttribute('data-theme', saved); }
+    const initialTheme = saved || 'dark';
+    setTheme(initialTheme);
+    document.documentElement.setAttribute('data-theme', initialTheme);
   }, []);
 
   useEffect(() => {
@@ -55,23 +53,56 @@ export default function Page() {
     document.documentElement.setAttribute('data-theme', next);
   };
 
+  const handleScrollToTop = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const published = projectList.filter(p => p.isPublished);
-  const totalPages = Math.ceil(published.length / projectsPerPage);
-  const paginated = published.slice((currentPage - 1) * projectsPerPage, currentPage * projectsPerPage);
 
   const marqueeItems = ['FULL-STACK DEV', 'NEXT.JS', 'REACT', 'NODE.JS', 'SPRING BOOT', 'JAVA', 'MONGODB', 'OPEN TO WORK'];
 
   // Hero split colors per theme
-  const heroLeft = theme === 'dark' ? '#0f0f0f' : '#f5f5f0';
-  const heroRight = '#73120d';
-  const heroTextColor = theme === 'dark' ? '#f0f0f0' : '#1c1c1c';
-  const heroTextLight = theme === 'dark' ? 'rgba(255,255,255,0.7)' : 'rgba(0,0,0,0.55)';
-  const heroTextMuted = theme === 'dark' ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.4)';
-  const heroLineColor = theme === 'dark' ? 'rgba(255,255,255,0.25)' : 'rgba(0,0,0,0.15)';
+  const heroLeft = theme === 'dark' ? '#0f0f0f' : '#e8ddcf';
+  const heroRight = theme === 'dark' ? '#73120d' : '#b65443';
+  const heroLeftGradient = theme === 'dark'
+    ? 'linear-gradient(135deg, #0c0d0f 0%, #14171b 45%, #1b2026 100%)'
+    : 'radial-gradient(circle at top left, rgba(255,250,243,0.95) 0%, rgba(255,250,243,0.7) 22%, rgba(0,0,0,0) 48%), linear-gradient(135deg, #fbf5ec 0%, #efe3d3 42%, #dcc8b2 100%)';
+  const heroRightGradient = theme === 'dark'
+    ? 'linear-gradient(135deg, #5e120f 0%, #7d1d17 50%, #a83728 100%)'
+    : 'linear-gradient(135deg, #9f4337 0%, #bb5a48 45%, #d88662 100%)';
+  const heroTextColor = theme === 'dark' ? '#f0f0f0' : '#1f1a16';
+  const heroTextLight = theme === 'dark' ? 'rgba(255,255,255,0.7)' : 'rgba(31,26,22,0.72)';
+  const heroTextMuted = theme === 'dark' ? 'rgba(255,255,255,0.5)' : 'rgba(31,26,22,0.52)';
+  const heroLineColor = theme === 'dark' ? 'rgba(255,255,255,0.25)' : 'rgba(31,26,22,0.18)';
   const heroLineHover = theme === 'dark' ? 'rgba(255,255,255,0.7)' : 'rgba(0,0,0,0.5)';
-  const heroHandleBg = theme === 'dark' ? 'rgba(0,0,0,0.5)' : 'rgba(255,255,255,0.7)';
-  const heroHandleBorder = theme === 'dark' ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.3)';
-  const heroHandleText = theme === 'dark' ? '#fff' : '#1c1c1c';
+  const heroHandleBg = theme === 'dark' ? 'rgba(0,0,0,0.5)' : 'rgba(255,248,240,0.78)';
+  const heroHandleBorder = theme === 'dark' ? 'rgba(255,255,255,0.4)' : 'rgba(31,26,22,0.22)';
+  const heroHandleText = theme === 'dark' ? '#fff' : '#1f1a16';
+  const isLightTheme = theme === 'light';
+  const chromeBg = isLightTheme ? 'rgba(231,220,205,0.95)' : 'rgba(26,29,33,0.95)';
+  const navBorder = isLightTheme ? 'rgba(29,27,25,0.1)' : 'rgba(240,106,90,0.22)';
+  const navText = isLightTheme ? 'text-brand-ink hover:text-brand-red' : 'text-brand-bg/92 hover:text-brand-red';
+  const navLink = isLightTheme ? 'text-brand-ink-soft hover:text-brand-ink' : 'text-brand-bg/72 hover:text-brand-bg';
+  const navMeta = isLightTheme ? 'text-brand-ink-soft hover:text-brand-red' : 'text-brand-bg/72 hover:text-brand-red';
+  const navInfoButton = isLightTheme
+    ? 'text-brand-red border-brand-red/45 hover:bg-brand-red hover:text-brand-bg'
+    : 'text-brand-red border-brand-red/45 hover:bg-brand-red hover:text-[#1a1d21]';
+  const navContactButton = isLightTheme
+    ? 'bg-brand-ink text-brand-bg hover:bg-brand-red'
+    : 'bg-brand-red text-brand-bg hover:bg-[#f6ede4] hover:text-[#171717]';
+  const inversePanelBg = isLightTheme ? '#d8c5b1' : 'var(--ink)';
+  const inversePanelText = isLightTheme ? 'var(--ink)' : 'var(--bg)';
+  const inversePanelMuted = isLightTheme ? 'rgba(29,27,25,0.72)' : 'rgba(244,239,231,0.8)';
+  const inversePanelSoft = isLightTheme ? 'rgba(29,27,25,0.56)' : 'rgba(244,239,231,0.65)';
+  const footerBg = isLightTheme ? '#d2bfaa' : '#0d0f11';
+  const footerText = isLightTheme ? 'rgba(29,27,25,0.68)' : 'rgba(244,239,231,0.84)';
+  const footerLink = isLightTheme ? 'rgba(29,27,25,0.82)' : 'rgba(244,239,231,0.94)';
+  const marqueeText = isLightTheme ? '#fff7f0' : '#ffffff';
+  const projectCardBg = isLightTheme ? 'rgba(247,241,232,0.84)' : 'rgba(24,27,32,0.8)';
+  const drawerBg = isLightTheme ? 'rgba(251,246,238,0.95)' : 'rgba(17,20,24,0.95)';
+  const drawerBorder = isLightTheme ? 'rgba(29,27,25,0.16)' : 'rgba(240,106,90,0.3)';
+  const profileHighlights = t.about.highlights ?? [];
 
   // Compute split position for cursor on hero
   const updateSplit = useCallback((clientX: number) => {
@@ -108,22 +139,25 @@ export default function Page() {
     <div className="min-h-screen bg-brand-bg font-sans transition-colors duration-300">
 
       {/* ── NAV ───────────────────────────────────────────── */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-[#1c1c1c] border-b-2 border-brand-red/40 px-8 lg:px-16 h-14 flex items-center justify-between">
-        <a href="#" className="flex items-center gap-3 text-white font-display font-black tracking-widest text-sm hover:text-brand-red transition-colors">
+      <nav
+        className="fixed top-0 left-0 right-0 z-50 backdrop-blur border-b-2 px-8 lg:px-16 h-14 flex items-center justify-between transition-colors"
+        style={{ backgroundColor: chromeBg, borderColor: navBorder }}
+      >
+        <a href="#hero" onClick={handleScrollToTop} className={`flex items-center gap-3 font-display font-black tracking-widest text-sm transition-colors ${navText}`}>
           <motion.div animate={{ opacity: [1, 0] }} transition={{ duration: 0.8, repeat: Infinity, repeatType: 'reverse' }} className="w-2 h-2 bg-brand-red" />
           JIRAYUS.EXE
         </a>
         <div className="hidden md:flex gap-8 items-center">
           {[{ id: 'about', label: t.nav.about }, { id: 'projects', label: t.nav.projects }, { id: 'skills', label: t.nav.skills }, { id: 'contact', label: t.nav.contact }].map(item => (
-            <a key={item.id} href={`#${item.id}`} className="text-[11px] font-mono font-bold text-gray-400 hover:text-white transition-colors tracking-[0.25em] uppercase">{item.label}</a>
+            <a key={item.id} href={`#${item.id}`} className={`text-[11px] font-mono font-bold transition-colors tracking-[0.25em] uppercase ${navLink}`}>{item.label}</a>
           ))}
-          <Link href="/about-info" className="text-[11px] font-mono font-bold text-brand-red border border-brand-red/40 px-2.5 py-1 hover:bg-brand-red hover:text-white transition-all tracking-widest">{t.nav.site_info}</Link>
-          <button onClick={toggleTheme} className="text-gray-400 hover:text-brand-red transition-colors p-1.5" aria-label="Toggle theme">
+          <Link href="/about-info" className={`text-[11px] font-mono font-bold border px-2.5 py-1 transition-all tracking-widest ${navInfoButton}`}>{t.nav.site_info}</Link>
+          <button onClick={toggleTheme} className={`transition-colors p-1.5 ${navMeta}`} aria-label="Toggle theme">
             {theme === 'light' ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
           </button>
-          <LanguageSwitcher />
+          <LanguageSwitcher isLightNav={isLightTheme} />
         </div>
-        <a href="#contact" className="bg-brand-red text-white px-5 py-1.5 text-[11px] font-mono font-bold hover:bg-white hover:text-[#1c1c1c] transition-all tracking-widest">
+        <a href="#contact" className={`px-5 py-1.5 text-[11px] font-mono font-bold transition-all tracking-widest ${navContactButton}`}>
           [{t.nav.contact}]
         </a>
       </nav>
@@ -135,7 +169,7 @@ export default function Page() {
         className="relative min-h-screen flex flex-col justify-center pt-14 overflow-hidden border-b-4 border-brand-ink"
       >
         {/* ===== LEFT LAYER (base) ===== */}
-        <div className="absolute inset-0" style={{ backgroundColor: heroLeft }} />
+        <div className="absolute inset-0" style={{ backgroundColor: heroLeft, backgroundImage: heroLeftGradient }} />
         <div className="absolute inset-0 dot-grid opacity-[0.06] pointer-events-none" />
 
         {/* ===== RIGHT LAYER (reveal — clipped from line to right) ===== */}
@@ -143,7 +177,7 @@ export default function Page() {
           className="absolute inset-0"
           style={{ clipPath: `inset(0 0 0 ${splitPct}%)` }}
         >
-          <div className="absolute inset-0" style={{ backgroundColor: heroRight }} />
+          <div className="absolute inset-0" style={{ backgroundColor: heroRight, backgroundImage: heroRightGradient }} />
           <div className="absolute inset-0 dot-grid opacity-[0.06] pointer-events-none" />
         </div>
 
@@ -203,7 +237,7 @@ export default function Page() {
             <a href="#projects" className="px-10 py-4 font-display font-black tracking-widest text-sm hover:opacity-90 transition-all shadow-[6px_6px_0_0_var(--red)]" style={{ backgroundColor: heroTextColor, color: heroLeft }}>
               {t.hero.viewProjects} →
             </a>
-            <a href="https://github.com/fermfirxzer" target="_blank" className="border-2 bg-transparent px-8 py-4 font-display font-black tracking-widest text-sm hover:opacity-80 transition-all flex items-center gap-2" style={{ borderColor: heroLineColor, color: heroTextColor }}>
+            <a href="https://github.com/fermfirxzer" target="_blank" rel="noreferrer" className="border-2 bg-transparent px-8 py-4 font-display font-black tracking-widest text-sm hover:opacity-80 transition-all flex items-center gap-2" style={{ borderColor: heroLineColor, color: heroTextColor }}>
               <Github className="w-4 h-4" /> {t.hero.github}
             </a>
           </motion.div>
@@ -218,10 +252,10 @@ export default function Page() {
       </section>
 
       {/* ── MARQUEE ───────────────────────────────────────── */}
-      <div className="bg-brand-red py-3 overflow-hidden border-y-2 border-brand-ink">
+      <div className="py-3 overflow-hidden border-y-2 border-brand-ink" style={{ backgroundColor: 'var(--red)' }}>
         <div className="marquee-track">
           {[...marqueeItems, ...marqueeItems].map((item, i) => (
-            <span key={i} className="text-white font-display font-black text-sm tracking-[0.3em] uppercase mx-10 shrink-0">
+            <span key={i} className="font-display font-black text-sm tracking-[0.3em] uppercase mx-10 shrink-0" style={{ color: marqueeText }}>
               {item} <span className="text-white/40">◆</span>
             </span>
           ))}
@@ -238,18 +272,69 @@ export default function Page() {
               <div className="absolute top-0 right-0 w-24 h-24 diagonal-lines opacity-30" />
               <h3 className="font-mono text-xs font-bold text-brand-red tracking-[0.25em] uppercase mb-6">{t.about.profile}</h3>
               <p className="text-lg font-medium leading-relaxed text-brand-ink-mid mb-4 italic">{t.about.desc1}</p>
-              <p className="text-base leading-relaxed text-brand-ink-mid">{t.about.desc2}</p>
+              <p className="text-base leading-relaxed text-brand-ink-mid mb-8">{t.about.desc2}</p>
+              <div className="border-t border-brand-rule/50 pt-6">
+                <p className="font-mono text-[10px] font-bold text-brand-red tracking-[0.28em] uppercase mb-4">
+                  {t.about.highlightsTitle}
+                </p>
+                <div className="space-y-3">
+                  {profileHighlights.map((item, index) => {
+                    const isOpen = activeProfileItem === index;
+                    return (
+                      <div key={item.title} className="border border-brand-rule/70 bg-brand-bg/60 overflow-hidden">
+                        <button
+                          type="button"
+                          onClick={() => setActiveProfileItem(isOpen ? null : index)}
+                          aria-expanded={isOpen}
+                          className="w-full flex items-start gap-4 px-4 py-3 text-left hover:bg-brand-card/60 transition-colors"
+                        >
+                          <span className="mt-1.5 inline-flex h-2.5 w-2.5 shrink-0 rounded-full bg-brand-red" />
+                          <span className="flex-1 min-w-0">
+                            <span className="block font-display font-bold text-sm text-brand-ink leading-tight">
+                              {item.title}
+                            </span>
+                            <span className="mt-1 block font-mono text-[10px] uppercase tracking-[0.22em] text-brand-ink-soft">
+                              Click to toggle details
+                            </span>
+                          </span>
+                          <ChevronDown
+                            className={`w-4 h-4 text-brand-red transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
+                          />
+                        </button>
+                        <AnimatePresence initial={false}>
+                          {isOpen && (
+                            <motion.div
+                              initial={{ height: 0, opacity: 0 }}
+                              animate={{ height: 'auto', opacity: 1 }}
+                              exit={{ height: 0, opacity: 0 }}
+                              transition={{ duration: 0.22, ease: 'easeOut' }}
+                              className="overflow-hidden"
+                            >
+                              <div className="px-4 pb-4 pl-10 pr-5">
+                                <div className="h-px w-full bg-brand-rule/50 mb-3" />
+                                <p className="text-sm leading-relaxed text-brand-ink-mid">
+                                  {item.detail}
+                                </p>
+                              </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
             </div>
             {/* education card */}
-            <div className="bg-[#1c1c1c] text-white border-2 border-brand-ink p-10 shadow-[8px_8px_0_0_var(--red)] flex flex-col gap-6">
+            <div className="border-2 border-brand-ink p-10 shadow-[8px_8px_0_0_var(--red)] flex flex-col gap-6" style={{ backgroundColor: inversePanelBg, color: inversePanelText }}>
               <GraduationCap className="w-10 h-10 text-brand-red" />
               <div>
                 <p className="font-mono text-xs font-bold text-brand-red tracking-[0.25em] uppercase mb-3">{t.about.education}</p>
                 <p className="font-display font-black text-xl leading-tight mb-2">{t.about.degree}</p>
-                <p className="text-sm text-gray-400 font-medium mb-4">{t.about.faculty}</p>
-                <p className="font-mono text-xs text-gray-500 tracking-widest mb-5">2022 — 2026</p>
+                <p className="text-sm font-medium mb-4" style={{ color: inversePanelMuted }}>{t.about.faculty}</p>
+                <p className="font-mono text-xs text-brand-bg/65 tracking-widest mb-5">2022 — 2026</p>
                 <div className="inline-flex items-center gap-2 bg-brand-red px-4 py-1.5 text-xs font-mono font-black tracking-wider">
-                  <Star className="w-3 h-3 fill-white text-white" /> {t.about.gpa}
+                  <Star className="w-3 h-3" style={{ fill: inversePanelText, color: inversePanelText }} /> {t.about.gpa}
                 </div>
               </div>
             </div>
@@ -266,7 +351,7 @@ export default function Page() {
             <div className="border-2 border-brand-ink bg-brand-card p-8 shadow-[6px_6px_0_0_var(--shadow)] self-start sticky top-20">
               <p className="font-mono text-xs font-bold text-brand-red tracking-[0.25em] uppercase mb-2">{t.experience.role}</p>
               <p className="font-display font-black text-3xl text-brand-ink mb-6 leading-tight">SCICAP<br />CO., LTD.</p>
-              <p className="inline-block bg-[#1c1c1c] text-white px-4 py-1.5 font-mono text-xs font-bold tracking-widest uppercase mb-2">{t.experience.duration}</p>
+              <p className="inline-block px-4 py-1.5 font-mono text-xs font-bold tracking-widest uppercase mb-2" style={{ backgroundColor: inversePanelBg, color: inversePanelText }}>{t.experience.duration}</p>
               <p className="font-mono text-xs text-brand-ink-soft tracking-widest uppercase">{t.experience.location}</p>
             </div>
             {/* right bullets */}
@@ -299,71 +384,91 @@ export default function Page() {
         <div className="max-w-[1400px] mx-auto">
           <SectionLabel label={t.projects.title} num="03" />
           <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6 mt-14">
-            {loading
-              ? [1, 2, 3].map(i => <div key={i} className="border-2 border-brand-ink bg-brand-card p-8 h-96 animate-pulse" />)
-              : paginated.map((project, idx) => (
-                <motion.div
-                  key={project.id}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ delay: idx * 0.07, duration: 0.5 }}
-                  viewport={{ once: true }}
-                  className="group relative bg-brand-card border-2 border-brand-ink flex flex-col shadow-[6px_6px_0_0_var(--shadow)] hover:shadow-[10px_10px_0_0_var(--red)] hover:-translate-y-1 hover:-translate-x-1 transition-all duration-300"
-                >
-                  {/* top stripe */}
-                  <div className="h-1.5 w-full bg-brand-ink group-hover:bg-brand-red transition-colors" />
-                  <div className="p-8 flex flex-col flex-1">
-                    <div className="flex items-center justify-between mb-6">
-                      <p className="font-mono text-xs font-bold text-brand-red tracking-[0.25em]">{project.num}</p>
-                      {isLoggedIn && (
-                        <Link href={`/admin/projects/${project.id}`} className="font-mono text-xs font-bold text-brand-ink-soft border border-brand-rule px-2 py-0.5 hover:bg-brand-ink hover:text-brand-bg transition-all uppercase z-10 relative">EDIT</Link>
-                      )}
-                    </div>
-                    <Link href={`/${project.id}`} className="block flex-1 z-0">
-                      <div className="mb-6 w-14 h-14 border-2 border-brand-ink flex items-center justify-center bg-brand-bg group-hover:bg-brand-red group-hover:border-brand-red transition-all group-hover:[&_svg]:text-white">
-                        {getIcon(project.icon)}
-                      </div>
-                      <h3 className="font-display font-black text-xl leading-tight mb-3 group-hover:text-brand-red transition-colors">{project.title}</h3>
-                      <p className="text-sm text-brand-ink-mid leading-relaxed line-clamp-3 mb-6">{project.description}</p>
-                    </Link>
-                    <div className="flex flex-wrap gap-2 mb-6">
-                      {project.tech.slice(0, 3).map(tech => (
-                        <span key={tech} className="font-mono text-xs font-bold border border-brand-rule bg-brand-bg px-2.5 py-1 text-brand-ink-soft uppercase tracking-wide">{tech}</span>
-                      ))}
-                    </div>
-                    <Link href={`/${project.id}`} className="mt-auto bg-[#1c1c1c] text-white font-mono text-xs font-bold py-3 px-4 w-full text-center flex items-center justify-center gap-2 hover:bg-brand-red transition-colors z-10 relative group-hover:tracking-[0.15em]">
-                      {t.projects.viewDetail} <ChevronRight className="w-3.5 h-3.5" />
-                    </Link>
+            {published.map((project, idx) => (
+              <motion.article
+                key={project.id}
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: idx * 0.06, duration: 0.45 }}
+                viewport={{ once: true }}
+                onClick={() => setActiveProject(project)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    setActiveProject(project);
+                  }
+                }}
+                role="button"
+                tabIndex={0}
+                className="group relative text-left border border-brand-rule/60 overflow-hidden p-6 md:p-7 backdrop-blur-sm hover:-translate-y-1 hover:shadow-[10px_14px_24px_rgba(0,0,0,0.2)] transition-all duration-300 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-red/70"
+                style={{ backgroundColor: projectCardBg }}
+              >
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" style={{ background: isLightTheme ? 'radial-gradient(circle at top right, rgba(169,71,57,0.15), transparent 45%)' : 'radial-gradient(circle at top right, rgba(240,106,90,0.2), transparent 45%)' }} />
+                <div className="relative z-10 flex items-start justify-between gap-4 mb-5">
+                  <ProjectIcon project={project} size="md" />
+                  <span className="font-mono text-[10px] font-bold tracking-[0.22em] text-brand-red">{project.num}</span>
+                </div>
+                <h3 className="relative z-10 font-display font-black text-xl leading-tight text-brand-ink mb-3 line-clamp-2 group-hover:text-brand-red transition-colors">{project.title}</h3>
+                <p className="relative z-10 text-sm text-brand-ink-mid leading-relaxed mb-5 line-clamp-3">{project.description}</p>
+                <div className="relative z-10 flex flex-wrap gap-2 mb-6">
+                  {project.tech.slice(0, 4).map(tech => (
+                    <span key={tech} className="font-mono text-[10px] font-bold border border-brand-rule bg-brand-bg px-2.5 py-1 text-brand-ink-soft uppercase tracking-wider">
+                      {tech}
+                    </span>
+                  ))}
+                </div>
+                <div className="relative z-10 mt-auto flex items-center gap-2.5">
+                  <span className="inline-flex items-center gap-2 font-mono text-xs font-bold text-brand-ink-soft group-hover:text-brand-ink transition-colors">
+                    View details <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                  </span>
+                  <div className="ml-auto flex items-center gap-2">
+                    {project.github && (
+                      <a
+                        href={project.github}
+                        target="_blank"
+                        rel="noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        className="w-9 h-9 border border-brand-rule hover:border-brand-red hover:text-brand-red inline-flex items-center justify-center transition-colors"
+                        aria-label={`Open GitHub for ${project.title}`}
+                      >
+                        <Github className="w-4 h-4" />
+                      </a>
+                    )}
+                    {project.liveUrl?.trim() && (
+                      <a
+                        href={project.liveUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        className="w-9 h-9 border border-brand-rule hover:border-brand-red hover:text-brand-red inline-flex items-center justify-center transition-colors"
+                        aria-label={`Open live demo for ${project.title}`}
+                      >
+                        <ExternalLink className="w-4 h-4" />
+                      </a>
+                    )}
                   </div>
-                </motion.div>
-              ))
-            }
+                </div>
+                {isLoggedIn && (
+                  <Link
+                    href={`/admin/projects/${project.id}`}
+                    onClick={(e) => e.stopPropagation()}
+                    className="relative z-10 inline-flex mt-5 font-mono text-[10px] font-bold text-brand-ink-soft border border-brand-rule px-2 py-0.5 hover:bg-brand-ink hover:text-brand-bg transition-all uppercase"
+                  >
+                    EDIT
+                  </Link>
+                )}
+              </motion.article>
+            ))}
           </div>
-
-          {/* Pagination */}
-          {!loading && totalPages > 1 && (
-            <div className="mt-16 flex items-center justify-center gap-4">
-              <button
-                onClick={() => { setCurrentPage(p => Math.max(p - 1, 1)); document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth' }); }}
-                disabled={currentPage === 1}
-                className={`flex items-center gap-2 px-6 py-3 font-mono text-xs font-bold border-2 border-brand-ink transition-all ${currentPage === 1 ? 'opacity-30 cursor-not-allowed' : 'hover:bg-brand-ink hover:text-brand-bg shadow-[4px_4px_0_0_var(--shadow)] hover:shadow-none'}`}
-              >
-                <ChevronRight className="w-4 h-4 rotate-180" /> {t.projects.prev}
-              </button>
-              <div className="px-6 py-3 bg-[#1c1c1c] text-white border-2 border-brand-ink font-mono text-xs font-black">
-                {String(currentPage).padStart(2, '0')} / {String(totalPages).padStart(2, '0')}
-              </div>
-              <button
-                onClick={() => { setCurrentPage(p => Math.min(p + 1, totalPages)); document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth' }); }}
-                disabled={currentPage === totalPages}
-                className={`flex items-center gap-2 px-6 py-3 font-mono text-xs font-bold border-2 border-brand-ink transition-all ${currentPage === totalPages ? 'opacity-30 cursor-not-allowed' : 'hover:bg-brand-ink hover:text-brand-bg shadow-[4px_4px_0_0_var(--shadow)] hover:shadow-none'}`}
-              >
-                {t.projects.next} <ChevronRight className="w-4 h-4" />
-              </button>
-            </div>
-          )}
         </div>
       </motion.section>
+
+      <ProjectDetailDrawer
+        project={activeProject}
+        onClose={() => setActiveProject(null)}
+        drawerBg={drawerBg}
+        drawerBorder={drawerBorder}
+      />
 
       {/* ── SKILLS ────────────────────────────────────────── */}
       <motion.section id="skills" className="py-28 px-8 lg:px-16 bg-brand-card/40 border-b-4 border-brand-ink" {...fadeUp}>
@@ -387,7 +492,9 @@ export default function Page() {
                 <p className="font-mono text-[10px] font-black text-brand-red tracking-[0.3em] uppercase pt-1.5">{row.cat}</p>
                 <div className="flex flex-wrap gap-3">
                   {row.items.map(skill => (
-                    <span key={skill} className="border-2 border-brand-ink bg-brand-bg px-4 py-1.5 font-mono text-xs font-bold text-brand-ink shadow-[2px_2px_0_0_var(--shadow)] hover:shadow-none hover:bg-brand-ink hover:text-brand-bg hover:translate-x-0.5 hover:translate-y-0.5 transition-all cursor-default">
+                    <span key={skill} className={`border-2 border-brand-ink bg-brand-bg px-4 py-1.5 font-mono text-xs font-bold text-brand-ink shadow-[2px_2px_0_0_var(--shadow)] hover:shadow-none hover:translate-x-0.5 hover:translate-y-0.5 transition-all cursor-default ${
+                      isLightTheme ? 'hover:bg-[#d8c5b1] hover:text-brand-ink' : 'hover:bg-brand-ink hover:text-brand-bg'
+                    }`}>
                       {skill}
                     </span>
                   ))}
@@ -413,14 +520,20 @@ export default function Page() {
                 { label: t.contact.email, value: 'jirayusfirxzer@gmail.com', href: 'mailto:jirayusfirxzer@gmail.com', Icon: Mail },
                 { label: t.contact.github, value: 'fermfirxzer', href: 'https://github.com/fermfirxzer', Icon: Github, target: '_blank' }
               ].map(({ label, value, href, Icon, target }) => (
-                <a key={label} href={href} target={target} className="group bg-brand-card hover:bg-[#1c1c1c] transition-colors flex items-center justify-between p-6 md:p-8">
+                <a key={label} href={href} target={target} rel={target === '_blank' ? 'noreferrer' : undefined} className={`group bg-brand-card transition-colors flex items-center justify-between p-6 md:p-8 ${
+                  isLightTheme ? 'hover:bg-[#e4d5c4]' : 'hover:bg-brand-ink'
+                }`}>
                   <div className="flex items-center gap-5">
                     <div className="w-10 h-10 border-2 border-brand-ink group-hover:border-brand-red flex items-center justify-center shrink-0 transition-colors">
                       <Icon className="w-4 h-4 text-brand-red" />
                     </div>
                     <div>
-                      <p className="font-mono text-[9px] font-bold text-brand-ink-soft group-hover:text-white/40 tracking-[0.25em] uppercase transition-colors">{label}</p>
-                      <p className="font-display font-bold text-lg text-brand-ink group-hover:text-white transition-colors">{value}</p>
+                      <p className={`font-mono text-[9px] font-bold text-brand-ink-soft tracking-[0.25em] uppercase transition-colors ${
+                        isLightTheme ? 'group-hover:text-brand-ink-soft' : 'group-hover:text-brand-bg/70'
+                      }`}>{label}</p>
+                      <p className={`font-display font-bold text-lg text-brand-ink transition-colors ${
+                        isLightTheme ? 'group-hover:text-brand-ink' : 'group-hover:text-brand-bg'
+                      }`}>{value}</p>
                     </div>
                   </div>
                   <ExternalLink className="w-4 h-4 text-brand-ink-soft group-hover:text-brand-red transition-colors" />
@@ -432,10 +545,10 @@ export default function Page() {
       </motion.section>
 
       {/* ── FOOTER ────────────────────────────────────────── */}
-      <footer className="bg-[#1c1c1c] py-10 px-8 lg:px-16">
+      <footer className="py-10 px-8 lg:px-16" style={{ backgroundColor: footerBg }}>
         <div className="max-w-[1400px] mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="font-mono text-xs font-bold text-gray-500 tracking-widest uppercase">{t.footer.copy}</p>
-          <a href="https://github.com/fermfirxzer" target="_blank" className="font-mono text-xs font-bold text-gray-400 hover:text-brand-red transition-colors tracking-widest uppercase">
+          <p className="font-mono text-xs font-bold tracking-widest uppercase" style={{ color: footerText }}>{t.footer.copy}</p>
+          <a href="https://github.com/fermfirxzer" target="_blank" rel="noreferrer" className="font-mono text-xs font-bold hover:text-brand-red transition-colors tracking-widest uppercase" style={{ color: footerLink }}>
             GITHUB.COM/FERMFIRXZER ↗
           </a>
         </div>
@@ -458,4 +571,3 @@ function SectionLabel({ label, num }: { label: string; num: string }) {
     </motion.div>
   );
 }
-

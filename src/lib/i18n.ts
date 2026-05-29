@@ -28,6 +28,21 @@ export const translations = {
       profile: '// PROFILE',
       desc1: "Computer Science student at King Mongkut's University of Technology North Bangkok (KMUTNB).",
       desc2: "I am a dedicated developer focused on building scalable, modern web applications that solve real-world problems. With hands-on industry experience from internship, I bring production-ready coding practices to every project.",
+      highlightsTitle: 'PROFILE HIGHLIGHTS',
+      highlights: [
+        {
+          title: 'Education',
+          detail: 'Computer Science student at KMUTNB with a 3.31 GPA and graduation planned for May 2026.',
+        },
+        {
+          title: 'Experience',
+          detail: 'Completed a 7-month internship building internal banking web apps with Java, Spring Boot, Thymeleaf, and Java Struts 2.',
+        },
+        {
+          title: 'Focus',
+          detail: 'I build scalable web applications with maintainable code, accessible interfaces, and production-ready workflows.',
+        },
+      ],
       education: '// EDUCATION',
       degree: 'B.Sc. Computer Science',
       faculty: 'Faculty of Applied Science, KMUTNB',
@@ -127,6 +142,21 @@ export const translations = {
       profile: '// โปรไฟล์',
       desc1: "นักศึกษาวิทยาการคอมพิวเตอร์ มหาวิทยาลัยเทคโนโลยีพระจอมเกล้าพระนครเหนือ (มจพ.)",
       desc2: "ผมเป็นนักพัฒนาที่มุ่งเน้นการสร้างเว็บแอปพลิเคชันที่รองรับการขยายตัวและใช้งานได้จริง จากประสบการณ์การฝึกงาน ผมพร้อมนำวิธีการเขียนโค้ดระดับ Production มาใช้ในทุกโปรเจกต์",
+      highlightsTitle: 'ข้อมูลเด่น',
+      highlights: [
+        {
+          title: 'การศึกษา',
+          detail: 'นักศึกษาวิทยาการคอมพิวเตอร์ที่ มจพ. เกรดเฉลี่ย 3.31 และคาดว่าจะจบในเดือนพฤษภาคม 2569',
+        },
+        {
+          title: 'ประสบการณ์',
+          detail: 'ผ่านการฝึกงาน 7 เดือน พัฒนาเว็บแอปธนาคารภายในด้วย Java, Spring Boot, Thymeleaf และ Java Struts 2',
+        },
+        {
+          title: 'จุดโฟกัส',
+          detail: 'มุ่งสร้างเว็บแอปพลิเคชันที่ขยายต่อได้ โค้ดดูแลง่าย และมีประสบการณ์ใช้งานที่พร้อมใช้งานจริง',
+        },
+      ],
       education: '// การศึกษา',
       degree: 'วท.บ. วิทยาการคอมพิวเตอร์',
       faculty: 'คณะวิทยาศาสตร์ประยุกต์ มจพ.',
@@ -226,6 +256,21 @@ export const translations = {
       profile: '// プロフィール',
       desc1: "キングモンクット工科大学ノースバンコク校 (KMUTNB) コンピュータサイエンス専攻。",
       desc2: "私は、現実世界の問題を解決する、スケーラブルでモダンなウェブアプリケーションの構築に注力している開発者です。インターンシップでの実践的な業界経験を活かし、すべてのプロジェクトで本番環境レベルのコーディングを実践します。",
+      highlightsTitle: 'プロフィールの要点',
+      highlights: [
+        {
+          title: '学歴',
+          detail: 'KMUTNB のコンピュータサイエンス専攻。GPA 3.31、2026年5月卒業予定です。',
+        },
+        {
+          title: '経験',
+          detail: '7か月のインターンで、Java、Spring Boot、Thymeleaf、Java Struts 2 を使った銀行向け社内Webアプリを開発しました。',
+        },
+        {
+          title: '重点',
+          detail: '保守しやすいコード、使いやすいUI、本番運用を意識したワークフローで、拡張性のあるWebアプリを作ります。',
+        },
+      ],
       education: '// 学歴',
       degree: '理学士 コンピュータサイエンス',
       faculty: '応用科学部、KMUTNB',

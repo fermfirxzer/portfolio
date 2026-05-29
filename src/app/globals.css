@@ -4,30 +4,36 @@
 @tailwind utilities;
 
 :root {
-  --bg: #fafaf8;
-  --card: #ffffff;
-  --ink: #1c1c1c;
-  --ink-mid: #3a3a3a;
-  --ink-soft: #555555;
-  --rule: #d8d7d0;
-  --shadow: #c8c7bf;
-  --red: #d63b2a;
+  --bg: #ece4d7;
+  --card: #f7f1e8;
+  --ink: #1d1b19;
+  --ink-mid: #35302b;
+  --ink-soft: #5a524a;
+  --rule: #c3b7a6;
+  --shadow: #ad9f8e;
+  --red: #a94739;
 }
 
 [data-theme='dark'] {
-  --bg: #0f0f0f;
-  --card: #1a1a1a;
-  --ink: #f0f0f0;
-  --ink-mid: #c0c0c0;
-  --ink-soft: #999999;
-  --rule: #2a2a2a;
-  --shadow: #000000;
-  --red: #e04535;
+  --bg: #121416;
+  --card: #1a1d21;
+  --ink: #f4efe7;
+  --ink-mid: #ddd5c9;
+  --ink-soft: #b8afa3;
+  --rule: #363a40;
+  --shadow: #070809;
+  --red: #f06a5a;
 }
 
 @layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
   body {
     @apply bg-brand-bg text-brand-ink font-sans antialiased selection:bg-brand-red selection:text-white transition-colors duration-300;
+    line-height: 1.6;
+    text-rendering: optimizeLegibility;
   }
 }
 

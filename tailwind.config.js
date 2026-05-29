@@ -17,7 +17,7 @@ module.exports = {
           'ink-soft': "var(--ink-soft)",
           rule: "var(--rule)",
           shadow: "var(--shadow)",
-          red: "#d63b2a",
+          red: "var(--red)",
         }
       },
       fontFamily: {

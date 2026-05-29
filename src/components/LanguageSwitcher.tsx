@@ -9,7 +9,7 @@ const languages: { code: Language; label: string; flag: string }[] = [
   { code: 'jp', label: '日本語', flag: 'https://flagcdn.com/w40/jp.png' },
 ];
 
-export default function LanguageSwitcher() {
+export default function LanguageSwitcher({ isLightNav = false }: { isLightNav?: boolean }) {
   const { lang, setLang } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -30,7 +30,11 @@ export default function LanguageSwitcher() {
     <div className="relative" ref={dropdownRef}>
       <button 
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2.5 text-xs font-mono font-bold text-white hover:text-brand-red transition-colors p-2 bg-white/5 rounded border border-white/10 hover:border-brand-red/50"
+        className={`flex items-center gap-2.5 text-xs font-mono font-bold transition-colors p-2 rounded border hover:border-brand-red/50 ${
+          isLightNav
+            ? 'text-brand-ink/80 hover:text-brand-red bg-black/0 border-brand-ink/15'
+            : 'text-brand-bg/82 hover:text-brand-red bg-brand-bg/5 border-brand-bg/12'
+        }`}
         aria-label="Select Language"
       >
         <img src={currentLang.flag} alt={currentLang.label} className="w-5 h-auto shadow-sm" />
@@ -54,7 +58,7 @@ export default function LanguageSwitcher() {
                   setLang(l.code);
                   setIsOpen(false);
                 }}
-                className={`w-full flex items-center gap-3 px-4 py-3 text-xs font-mono font-bold text-left hover:bg-brand-ink hover:text-brand-card transition-all ${
+                className={`w-full flex items-center gap-3 px-4 py-3 text-xs font-mono font-bold text-left hover:bg-brand-ink hover:text-brand-bg transition-all ${
                   lang === l.code ? 'bg-brand-bg text-brand-red' : 'text-brand-ink'
                 }`}
               >
