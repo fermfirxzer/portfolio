@@ -13,7 +13,7 @@ import ProjectDetailDrawer, { ProjectIcon } from '@/components/ProjectDetailDraw
 const fadeUp = { initial: { opacity: 0, y: 40 }, whileInView: { opacity: 1, y: 0 }, viewport: { once: true, amount: 0.1 }, transition: { duration: 0.6, ease: 'easeOut' } };
 
 export default function Page() {
-  const [theme, setTheme] = useState<'light' | 'dark'>('dark');
+  const [theme, setTheme] = useState<'light' | 'dark'>('light');
   const { tObj: t } = useLanguage();
   const [projectList] = useState<Project[]>(projects);
   const [activeProject, setActiveProject] = useState<Project | null>(null);
@@ -27,7 +27,7 @@ export default function Page() {
 
   useEffect(() => {
     const saved = localStorage.getItem('theme') as 'light' | 'dark';
-    const initialTheme = saved || 'dark';
+    const initialTheme = saved || 'light';
     setTheme(initialTheme);
     document.documentElement.setAttribute('data-theme', initialTheme);
   }, []);
