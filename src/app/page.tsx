@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Github, ExternalLink, GraduationCap, Star, ChevronRight, ChevronDown, Sun, Moon, MapPin, Mail, Phone } from 'lucide-react';
+import { Github, ExternalLink, GraduationCap, Star, ChevronRight, ChevronDown, Sun, Moon, MapPin, Mail, Phone, Download } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 import Link from 'next/link';
 import { Project, projects } from '@/lib/projects';
@@ -91,6 +91,7 @@ export default function Page() {
   const navContactButton = isLightTheme
     ? 'bg-brand-ink text-brand-bg hover:bg-brand-red'
     : 'bg-brand-red text-brand-bg hover:bg-[#f6ede4] hover:text-[#171717]';
+  const resumeHref = '/Resume_jirayus.pdf';
   const inversePanelBg = isLightTheme ? '#d8c5b1' : 'var(--ink)';
   const inversePanelText = isLightTheme ? 'var(--ink)' : 'var(--bg)';
   const inversePanelMuted = isLightTheme ? 'rgba(29,27,25,0.72)' : 'rgba(244,239,231,0.8)';
@@ -152,14 +153,37 @@ export default function Page() {
             <a key={item.id} href={`#${item.id}`} className={`text-[11px] font-mono font-bold transition-colors tracking-[0.25em] uppercase ${navLink}`}>{item.label}</a>
           ))}
           <Link href="/about-info" className={`text-[11px] font-mono font-bold border px-2.5 py-1 transition-all tracking-widest ${navInfoButton}`}>{t.nav.site_info}</Link>
+          <a
+            href={resumeHref}
+            target="_blank"
+            rel="noreferrer"
+            className={`inline-flex items-center gap-2 text-[11px] font-mono font-bold border px-2.5 py-1 transition-all tracking-widest ${navInfoButton}`}
+            aria-label="View resume PDF"
+          >
+            <Download className="w-3.5 h-3.5" />
+            VIEW RESUME
+          </a>
           <button onClick={toggleTheme} className={`transition-colors p-1.5 ${navMeta}`} aria-label="Toggle theme">
             {theme === 'light' ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
           </button>
           <LanguageSwitcher isLightNav={isLightTheme} />
         </div>
-        <a href="#contact" className={`px-5 py-1.5 text-[11px] font-mono font-bold transition-all tracking-widest ${navContactButton}`}>
-          [{t.nav.contact}]
-        </a>
+        <div className="flex items-center gap-2">
+          <a
+            href={resumeHref}
+            target="_blank"
+            rel="noreferrer"
+            className={`inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 text-[11px] font-mono font-bold transition-all tracking-widest ${navInfoButton}`}
+            aria-label="View resume PDF"
+          >
+            <Download className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">VIEW RESUME</span>
+            <span className="sm:hidden">VIEW</span>
+          </a>
+          <a href="#contact" className={`px-5 py-1.5 text-[11px] font-mono font-bold transition-all tracking-widest ${navContactButton}`}>
+            [{t.nav.contact}]
+          </a>
+        </div>
       </nav>
 
       {/* ── HERO (split-reveal) ──────────────────────────── */}
@@ -234,6 +258,16 @@ export default function Page() {
           </motion.div>
 
           <motion.div {...fadeUp} transition={{ delay: 0.4, duration: 0.6 }} className="flex flex-wrap gap-4 pointer-events-auto">
+            <a
+              href={resumeHref}
+              target="_blank"
+              rel="noreferrer"
+              className="px-10 py-4 font-display font-black tracking-widest text-sm transition-all border-2 flex items-center gap-2 shadow-[6px_6px_0_0_var(--red)]"
+              style={{ backgroundColor: heroTextColor, color: heroLeft, borderColor: heroTextColor }}
+              aria-label="View resume PDF"
+            >
+              <Download className="w-4 h-4" /> VIEW RESUME
+            </a>
             <a href="#projects" className="px-10 py-4 font-display font-black tracking-widest text-sm hover:opacity-90 transition-all shadow-[6px_6px_0_0_var(--red)]" style={{ backgroundColor: heroTextColor, color: heroLeft }}>
               {t.hero.viewProjects} →
             </a>
@@ -350,7 +384,15 @@ export default function Page() {
             {/* left meta */}
             <div className="border-2 border-brand-ink bg-brand-card p-8 shadow-[6px_6px_0_0_var(--shadow)] self-start sticky top-20">
               <p className="font-mono text-xs font-bold text-brand-red tracking-[0.25em] uppercase mb-2">{t.experience.role}</p>
-              <p className="font-display font-black text-3xl text-brand-ink mb-6 leading-tight">SCICAP<br />CO., LTD.</p>
+              <a
+                href="https://www.sycapt.com/"
+                target="_blank"
+                rel="noreferrer"
+                className="font-display font-black text-3xl text-brand-ink mb-6 leading-tight hover:text-brand-red transition-colors inline-block"
+                aria-label="Open SCICAP company website"
+              >
+                SCICAP<br />CO., LTD.
+              </a>
               <p className="inline-block px-4 py-1.5 font-mono text-xs font-bold tracking-widest uppercase mb-2" style={{ backgroundColor: inversePanelBg, color: inversePanelText }}>{t.experience.duration}</p>
               <p className="font-mono text-xs text-brand-ink-soft tracking-widest uppercase">{t.experience.location}</p>
             </div>

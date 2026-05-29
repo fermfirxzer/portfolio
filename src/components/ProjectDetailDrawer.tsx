@@ -7,7 +7,9 @@ import { X, Github, ExternalLink, ChevronRight, Calendar } from 'lucide-react';
 import {
   Project,
   ProjectFeature,
+  ProjectFeatureBlock,
   getIcon,
+  getFeatureBlocks,
   getProjectLink,
   getProjectFeatures,
 } from '@/lib/projects';
@@ -45,7 +47,41 @@ export default function ProjectDetailDrawer({
   }, [project, onClose]);
 
   const activeFeature: ProjectFeature | undefined = features.find(f => f.id === activeFeatureId);
-  const hasRichFeatures = features.some(f => f.detail || f.image);
+  const hasRichFeatures = features.some(f => f.blocks?.length || f.detail || f.image);
+
+  const renderFeatureBlock = (block: ProjectFeatureBlock, featureTitle: string, index: number) => {
+    switch (block.type) {
+      case 'text':
+        return (
+          <p key={`text-${index}`} className="text-sm sm:text-base text-brand-ink-mid leading-relaxed whitespace-pre-line">
+            {block.text}
+          </p>
+        );
+      case 'image':
+        return (
+          <figure key={`image-${index}`} className="space-y-2 min-w-0 max-w-full">
+            <div className="relative w-full max-w-full aspect-video border border-brand-rule/60 overflow-hidden bg-brand-bg shrink-0">
+              <Image
+                src={block.src}
+                alt={block.alt || featureTitle}
+                fill
+                className="object-cover object-top"
+                sizes="(max-width: 1024px) 100vw, 60vw"
+              />
+            </div>
+            {block.caption ? (
+              <figcaption className="text-[11px] font-mono uppercase tracking-[0.18em] text-brand-ink-soft">
+                {block.caption}
+              </figcaption>
+            ) : null}
+          </figure>
+        );
+      case 'spacer':
+        return <div key={`spacer-${index}`} className="h-2" />;
+      default:
+        return null;
+    }
+  };
 
   return (
     <AnimatePresence>
@@ -111,24 +147,29 @@ export default function ProjectDetailDrawer({
                           <li key={feature.id}>
                             <button
                               type="button"
-                              onClick={() => setActiveFeatureId(feature.id)}
+                              onClick={() => setActiveFeatureId(isActive ? null : feature.id)}
+                              aria-expanded={isActive}
                               className={`w-full text-left px-3 py-3 border transition-all ${
                                 isActive
                                   ? 'border-brand-red bg-brand-red/10 text-brand-ink'
                                   : 'border-brand-rule/60 bg-brand-card/30 text-brand-ink-mid hover:border-brand-red/40 hover:bg-brand-card/60'
                               }`}
                             >
-                              <span className="font-mono text-[9px] font-black text-brand-red tracking-widest block mb-1">
-                                {String(index + 1).padStart(2, '0')}
-                              </span>
-                              <span className="font-display font-bold text-sm leading-snug block">
-                                {feature.title}
-                              </span>
-                              {feature.summary && (
-                                <span className="text-xs text-brand-ink-soft mt-1 line-clamp-2 block">
-                                  {feature.summary}
+                              <span className="flex items-start gap-3">
+                                <span className={`mt-0.5 inline-flex h-6 min-w-6 items-center justify-center rounded-full border px-1.5 font-mono text-[10px] font-black tracking-widest transition-colors ${isActive ? 'border-brand-red bg-brand-red text-brand-bg' : 'border-brand-rule/60 bg-brand-bg text-brand-ink-soft'}`}>
+                                  {String(index + 1).padStart(2, '0')}
                                 </span>
-                              )}
+                                <span className="min-w-0 flex-1">
+                                  <span className="font-display font-bold text-sm leading-snug block">
+                                    {feature.title}
+                                  </span>
+                                  {feature.summary && (
+                                    <span className="text-xs text-brand-ink-soft mt-1 line-clamp-2 block">
+                                      {feature.summary}
+                                    </span>
+                                  )}
+                                </span>
+                              </span>
                             </button>
                           </li>
                         );
@@ -141,7 +182,7 @@ export default function ProjectDetailDrawer({
               </div>
 
               {/* Feature detail panel */}
-              <div className="flex-1 min-h-0 overflow-y-auto bg-brand-card/20">
+              <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden bg-brand-card/20">
                 <AnimatePresence mode="wait">
                   {activeFeature ? (
                     <motion.div
@@ -150,27 +191,24 @@ export default function ProjectDetailDrawer({
                       animate={{ opacity: 1, x: 0 }}
                       exit={{ opacity: 0, x: -8 }}
                       transition={{ duration: 0.25 }}
-                      className="p-5 sm:p-6 h-full flex flex-col"
+                      className="p-5 sm:p-6 h-full flex flex-col min-w-0 overflow-x-hidden"
                     >
                       <h5 className="font-display font-black text-lg sm:text-xl text-brand-ink mb-4">
                         {activeFeature.title}
                       </h5>
 
-                      {activeFeature.image && (
-                        <div className="relative w-full aspect-video mb-5 border border-brand-rule/60 overflow-hidden bg-brand-bg shrink-0">
-                          <Image
-                            src={activeFeature.image}
-                            alt={activeFeature.title}
-                            fill
-                            className="object-cover object-top"
-                            sizes="(max-width: 1024px) 100vw, 60vw"
-                          />
-                        </div>
-                      )}
-
-                      <p className="text-sm sm:text-base text-brand-ink-mid leading-relaxed whitespace-pre-line">
-                        {activeFeature.detail || activeFeature.summary || 'No additional details for this feature.'}
-                      </p>
+                      {(() => {
+                        const blocks = getFeatureBlocks(activeFeature);
+                        return blocks.length > 0 ? (
+                          <div className="space-y-5 min-w-0">
+                            {blocks.map((block, index) => renderFeatureBlock(block, activeFeature.title, index))}
+                          </div>
+                        ) : (
+                          <p className="text-sm sm:text-base text-brand-ink-mid leading-relaxed whitespace-pre-line">
+                            {activeFeature.detail || activeFeature.summary || 'No additional details for this feature.'}
+                          </p>
+                        );
+                      })()}
                     </motion.div>
                   ) : (
                     <motion.div
@@ -179,7 +217,7 @@ export default function ProjectDetailDrawer({
                       animate={{ opacity: 1 }}
                       className="p-6 text-sm text-brand-ink-soft"
                     >
-                      Select a feature from the list to view details.
+                      Click a feature bullet to view details, or click it again to hide them.
                     </motion.div>
                   )}
                 </AnimatePresence>
