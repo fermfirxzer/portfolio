@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Github, ExternalLink, GraduationCap, Star, ChevronRight, ChevronDown, Sun, Moon, MapPin, Mail, Phone, Download } from 'lucide-react';
-import { AnimatePresence, motion } from 'motion/react';
+import { Github, ExternalLink, GraduationCap, Star, ChevronRight, Sun, Moon, MapPin, Mail, Phone, Download } from 'lucide-react';
+import { motion } from 'motion/react';
 import Link from 'next/link';
 import { Project, projects } from '@/lib/projects';
 import { supabase } from '@/lib/supabase';
@@ -17,7 +17,6 @@ export default function Page() {
   const { tObj: t } = useLanguage();
   const [projectList] = useState<Project[]>(projects);
   const [activeProject, setActiveProject] = useState<Project | null>(null);
-  const [activeProfileItem, setActiveProfileItem] = useState<number | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   // Split-reveal: draggable vertical line inside hero
@@ -103,7 +102,6 @@ export default function Page() {
   const projectCardBg = isLightTheme ? 'rgba(247,241,232,0.84)' : 'rgba(24,27,32,0.8)';
   const drawerBg = isLightTheme ? 'rgba(251,246,238,0.95)' : 'rgba(17,20,24,0.95)';
   const drawerBorder = isLightTheme ? 'rgba(29,27,25,0.16)' : 'rgba(240,106,90,0.3)';
-  const profileHighlights = t.about.highlights ?? [];
 
   // Compute split position for cursor on hero
   const updateSplit = useCallback((clientX: number) => {
@@ -153,16 +151,6 @@ export default function Page() {
             <a key={item.id} href={`#${item.id}`} className={`text-[11px] font-mono font-bold transition-colors tracking-[0.25em] uppercase ${navLink}`}>{item.label}</a>
           ))}
           <Link href="/about-info" className={`text-[11px] font-mono font-bold border px-2.5 py-1 transition-all tracking-widest ${navInfoButton}`}>{t.nav.site_info}</Link>
-          <a
-            href={resumeHref}
-            target="_blank"
-            rel="noreferrer"
-            className={`inline-flex items-center gap-2 text-[11px] font-mono font-bold border px-2.5 py-1 transition-all tracking-widest ${navInfoButton}`}
-            aria-label="View resume PDF"
-          >
-            <Download className="w-3.5 h-3.5" />
-            VIEW RESUME
-          </a>
           <button onClick={toggleTheme} className={`transition-colors p-1.5 ${navMeta}`} aria-label="Toggle theme">
             {theme === 'light' ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
           </button>
@@ -307,57 +295,6 @@ export default function Page() {
               <h3 className="font-mono text-xs font-bold text-brand-red tracking-[0.25em] uppercase mb-6">{t.about.profile}</h3>
               <p className="text-lg font-medium leading-relaxed text-brand-ink-mid mb-4 italic">{t.about.desc1}</p>
               <p className="text-base leading-relaxed text-brand-ink-mid mb-8">{t.about.desc2}</p>
-              <div className="border-t border-brand-rule/50 pt-6">
-                <p className="font-mono text-[10px] font-bold text-brand-red tracking-[0.28em] uppercase mb-4">
-                  {t.about.highlightsTitle}
-                </p>
-                <div className="space-y-3">
-                  {profileHighlights.map((item, index) => {
-                    const isOpen = activeProfileItem === index;
-                    return (
-                      <div key={item.title} className="border border-brand-rule/70 bg-brand-bg/60 overflow-hidden">
-                        <button
-                          type="button"
-                          onClick={() => setActiveProfileItem(isOpen ? null : index)}
-                          aria-expanded={isOpen}
-                          className="w-full flex items-start gap-4 px-4 py-3 text-left hover:bg-brand-card/60 transition-colors"
-                        >
-                          <span className="mt-1.5 inline-flex h-2.5 w-2.5 shrink-0 rounded-full bg-brand-red" />
-                          <span className="flex-1 min-w-0">
-                            <span className="block font-display font-bold text-sm text-brand-ink leading-tight">
-                              {item.title}
-                            </span>
-                            <span className="mt-1 block font-mono text-[10px] uppercase tracking-[0.22em] text-brand-ink-soft">
-                              Click to toggle details
-                            </span>
-                          </span>
-                          <ChevronDown
-                            className={`w-4 h-4 text-brand-red transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
-                          />
-                        </button>
-                        <AnimatePresence initial={false}>
-                          {isOpen && (
-                            <motion.div
-                              initial={{ height: 0, opacity: 0 }}
-                              animate={{ height: 'auto', opacity: 1 }}
-                              exit={{ height: 0, opacity: 0 }}
-                              transition={{ duration: 0.22, ease: 'easeOut' }}
-                              className="overflow-hidden"
-                            >
-                              <div className="px-4 pb-4 pl-10 pr-5">
-                                <div className="h-px w-full bg-brand-rule/50 mb-3" />
-                                <p className="text-sm leading-relaxed text-brand-ink-mid">
-                                  {item.detail}
-                                </p>
-                              </div>
-                            </motion.div>
-                          )}
-                        </AnimatePresence>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
             </div>
             {/* education card */}
             <div className="border-2 border-brand-ink p-10 shadow-[8px_8px_0_0_var(--red)] flex flex-col gap-6" style={{ backgroundColor: inversePanelBg, color: inversePanelText }}>

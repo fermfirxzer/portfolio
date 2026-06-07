@@ -134,7 +134,7 @@ export default function AboutSitePage() {
 
         <div className="flex items-center gap-3 sm:gap-6">
           <a
-            href="https://github.com/fermfirxzer/portfolio-v2"
+            href="https://github.com/fermfirxzer/portfolio"
             target="_blank"
             rel="noreferrer"
             className="hidden sm:inline-flex items-center gap-2 px-3 py-1.5 text-[11px] font-mono font-bold border border-brand-red/40 text-brand-red hover:bg-brand-red hover:text-brand-bg transition-colors tracking-widest"
@@ -295,7 +295,7 @@ export default function AboutSitePage() {
                 {t('about_info.open_source.desc')}
               </p>
               <a
-                href="https://github.com/fermfirxzer/portfolio-v2"
+                href="https://github.com/fermfirxzer/portfolio"
                 target="_blank"
                 rel="noreferrer"
                 className="inline-flex items-center gap-2 px-5 py-3 bg-brand-red text-brand-bg font-mono text-xs font-black tracking-widest hover:opacity-90 transition-opacity"

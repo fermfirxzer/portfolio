@@ -277,7 +277,7 @@ export const projects: Project[] = [
       },
     ],
     tech: ['React.js', 'Node.js', 'Express', 'Bootstrap'],
-    github: 'https://github.com/fermfirxzer',
+    github: 'https://github.com/fermfirxzer/Novelreading_SEproject',
     liveUrl: '',
     createdAt: '2026-04-29T13:18:39.365891+00:00',
     contributors: [
@@ -331,7 +331,7 @@ export const projects: Project[] = [
       },
     ],
     tech: ['React.js', 'Chart.js', 'Tailwind CSS'],
-    github: 'https://github.com/fermfirxzer',
+    github: 'https://github.com/fermfirxzer/React_Numeric',
     liveUrl: '',
     createdAt: '2026-04-29T13:18:39.365891+00:00',
     contributors: [
