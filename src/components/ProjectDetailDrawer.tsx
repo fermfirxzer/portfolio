@@ -147,7 +147,11 @@ export default function ProjectDetailDrawer({
                           <li key={feature.id}>
                             <button
                               type="button"
-                              onClick={() => setActiveFeatureId(isActive ? null : feature.id)}
+                              onClick={() => {
+                                if (!isActive) {
+                                  setActiveFeatureId(feature.id);
+                                }
+                              }}
                               aria-expanded={isActive}
                               className={`w-full text-left px-3 py-3 border transition-all ${
                                 isActive
@@ -217,7 +221,7 @@ export default function ProjectDetailDrawer({
                       animate={{ opacity: 1 }}
                       className="p-6 text-sm text-brand-ink-soft"
                     >
-                      Click a feature bullet to view details, or click it again to hide them.
+                      Click a feature bullet to view details.
                     </motion.div>
                   )}
                 </AnimatePresence>
